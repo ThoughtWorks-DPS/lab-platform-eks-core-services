@@ -19,10 +19,6 @@ parameters:
     description: shell options for all jobs
     type: string
     default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
-  metrics-server-version:
-    description: metrics-server helm chart version
-    type: string
-    default: 3.7.0
   executor-image:
     description: image to use for local jobs
     type: string
@@ -90,9 +86,9 @@ jobs:
           cluster: << parameters.cluster >>
       - run:
           name: deploy metrics-server
-          command: bash scripts/deploy_metrics_server.sh << pipeline.parameters.metrics-server-version >>
+          command: bash scripts/deploy_metrics_server.sh << parameters.cluster >>
       - run:
-          name: deploy kube-state-metrics v2.3.0
+          name: deploy kube-state-metrics
           command: kubectl apply -f metrics-apis/kube-state-metrics --recursive
       # - run:
       #     name: deploy cluster-autoscaler

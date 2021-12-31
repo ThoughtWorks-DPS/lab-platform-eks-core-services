@@ -10,8 +10,8 @@
 
 ## current configuration
 
-* metrics-server
-* kube-state-metrics
-* cluster-autoscaler
+* metrics-server (managed by chart version parameter in environments file)
+* kube-state-metrics (currently fixed at v2.3.0)
+* cluster-autoscaler (managed by chart version parameter in environments file)
 
 
