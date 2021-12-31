@@ -1,0 +1,115 @@
+---
+version: 2.1
+
+orbs:
+  terraform: twdps/terraform@0.4.0
+  # can override kubectl, awspec versions as necessary
+  kube: twdps/kube-ops@dev:latest
+  # used for github-release-notes feature
+  executor-tools: twdps/executor-tools@0.2.0
+
+# ==== global pipeline parameters
+
+parameters:
+  context:
+    description: circleci context for all jobs
+    type: string
+    default: twdps-core-labs-team
+  shell-options:
+    description: shell options for all jobs
+    type: string
+    default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
+  metrics-server-version:
+    description: metrics-server helm chart version
+    type: string
+    default: 3.7.0
+  executor-image:
+    description: image to use for local jobs
+    type: string
+    default: twdps/circleci-kube-ops:alpine-0.4.0
+
+# git push: deploy sandbox
+on-push-main: &on-push-main
+  branches:
+    only: /main/
+  tags:
+    ignore: /.*/
+
+# git tag: release to preview cluster
+on-tag-main: &on-tag-main
+  branches:
+    ignore: /.*/
+  tags:
+    only: /.*/
+
+commands:
+
+  set-environment:
+    description: generate environment credentials and configuration from templates
+    parameters:
+      cluster:
+        description: cluster environment
+        type: string
+    steps:
+      - run:
+          name: set ~/.terraformrc
+          command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      - run:
+          name: set << parameters.cluster >> environment variables
+          command: |
+            secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
+
+  set-kubeconfig:
+    parameters:
+      cluster:
+        description: cluster to configure
+        type: string
+    steps:
+      - run:
+          name: setup kubeconfig and deploy core services
+          command: |
+            mkdir -p ~/.kube
+            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+
+jobs:
+
+  deploy-core-services:
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    parameters:
+      cluster:
+        description: cluster to configure
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: << parameters.cluster >>
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: deploy metrics-server
+          command: bash scripts/deploy_metrics_server.sh << pipeline.parameters.metrics-server-version >>
+      - run:
+          name: deploy kube-state-metrics v2.3.0
+          command: kubectl apply -f metrics-apis/kube-state-metrics --recursive
+      # - run:
+      #     name: deploy cluster-autoscaler
+      #     command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+      - run:
+          name: smoketest core services
+          command: bash scripts/core_services_health_check.sh << parameters.cluster >>
+
+
+workflows:
+  version: 2
+
+  lab-platform-eks-core-services-pipeline:
+    jobs:
+
+      # create oidc-roles
+      # - terraform/apply:
+
+      - deploy-core-services:
+          cluster: sandbox
