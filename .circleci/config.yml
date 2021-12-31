@@ -112,4 +112,7 @@ workflows:
       # - terraform/apply:
 
       - deploy-core-services:
+          name: deploy-sandbox-core-services
+          context: << pipeline.parameters.context >>
           cluster: sandbox
+          filters: *on-push-main
