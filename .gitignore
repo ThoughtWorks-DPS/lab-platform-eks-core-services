@@ -1,0 +1,4 @@
+sandbox.auto.tfvars.json
+kubeconfig_sandbox
+.terraform
+.terraform.*

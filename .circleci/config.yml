@@ -19,6 +19,10 @@ parameters:
     description: shell options for all jobs
     type: string
     default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
+  terraform-version:
+    description: terraform version for all jobs
+    type: string
+    default: "1.1.2"
   executor-image:
     description: image to use for local jobs
     type: string
@@ -69,6 +73,23 @@ commands:
 
 jobs:
 
+  create-custom-system-namespaces:
+    parameters:
+      cluster:
+        description: cluster being configured
+        type: string
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: Create custom system namespaces
+          command: kubectl apply -f standard-system-namespaces.yaml
+
   deploy-core-services:
     docker:
       - image: << pipeline.parameters.executor-image >>
@@ -87,13 +108,15 @@ jobs:
       - run:
           name: deploy metrics-apis
           command: kubectl apply -f metrics-apis --recursive
-      # - run:
-      #     name: deploy cluster-autoscaler
-      #     command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+      - run:
+          name: deploy cluster-autoscaler
+          command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+      - run:
+          name: deploy system namespaces and roles
+          command: kubectl apply -f system-ns-and-roles --recursive
       - run:
           name: smoketest core services
           command: bash scripts/core_services_health_check.sh << parameters.cluster >>
-
 
 workflows:
   version: 2
@@ -101,11 +124,22 @@ workflows:
   lab-platform-eks-core-services-pipeline:
     jobs:
 
-      # create oidc-roles
-      # - terraform/apply:
+      # create oidc assumable roles for core services as necessary
+      - terraform/apply:
+          name: apply-sandbox-core-service-roles
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
+          workspace: sandbox
+          terraform-version: << pipeline.parameters.terraform-version >>
+          before-terraform:
+            - set-environment:
+                cluster: sandbox
+          filters: *on-push-main
 
       - deploy-core-services:
           name: deploy-sandbox-core-services
           context: << pipeline.parameters.context >>
           cluster: sandbox
+          requires:
+            - apply-sandbox-core-service-roles
           filters: *on-push-main

@@ -10,8 +10,17 @@
 
 ## current configuration
 
-* metrics-server (managed by chart version parameter in environments file)
-* kube-state-metrics (currently fixed at v2.3.0)
-* cluster-autoscaler (managed by chart version parameter in environments file)
+* metrics-server (v0.5.2)
+* kube-state-metrics (v2.3.0)
+* cluster-autoscaler (eks_version)
+* create core system namespaces and roles
+  * ns: lab-system
+  * role: admin-clusterrole
 
+### lab-system
 
+The `lab-system` namespace is reserved for the platform product teams use with cluster-wide services and testing.  
+
+### admin-clusterrole
+
+The `admin-clusterrole` is created with the default system:admin permissions and bound to the Github team group definition `ThoughtWorks-DPS/twdps-core-labs-team` to enable team members admin access when logging in via the dpscli platform tool.  

@@ -1,18 +1,16 @@
 locals {
   cluster_autoscaler_namespace            = "kube-system"
   cluster_autoscaler_service_account_name = "${var.cluster_name}-cluster-autoscaler"
-
-  # oidc_issuer = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
 }
 
 # cluster-autoscaler
 module "assumable_role_cluster_autoscaler" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version = "4.1.0"
+  version = "4.7.0"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cluster-autoscaler"
-  provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
+  provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   role_policy_arns              = [aws_iam_policy.cluster_autoscaler_role_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_autoscaler_namespace}:${local.cluster_autoscaler_service_account_name}"]
   number_of_role_policy_arns    = 1
@@ -54,7 +52,7 @@ data "aws_iam_policy_document" "cluster_autoscaler_role_policy_document" {
 
     condition {
       test     = "StringEquals"
-      variable = "autoscaling:ResourceTag/kubernetes.io/cluster/${module.eks.cluster_id}"
+      variable = "autoscaling:ResourceTag/kubernetes.io/cluster/${var.cluster_name}}"
       values   = ["owned"]
     }
 

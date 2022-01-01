@@ -10,7 +10,18 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-# @test "evaluate cluster-autoscaler status" {
-#   run bash -c "kubectl get po -n kube-system -o wide | grep 'cluster-autoscaler'"
-#   [[ "${output}" =~ "Running" ]]
-# }
+@test "evaluate cluster-autoscaler status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'cluster-autoscaler'"
+  [[ "${output}" =~ "Running" ]]
+}
+
+@test "evaluate standard namespaces" {
+  run bash -c "kubectl get ns"
+  [[ "${output}" =~ "lab-system" ]]
+}
+
+@test "evaluate system roles" {
+  run bash -c "kubectl get clusterroles"
+  [[ "${output}" =~ "admin-clusterrole" ]]
+}
+
