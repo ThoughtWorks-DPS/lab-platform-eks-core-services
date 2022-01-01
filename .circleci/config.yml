@@ -85,11 +85,8 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
-          name: deploy metrics-server
-          command: bash scripts/deploy_metrics_server.sh << parameters.cluster >>
-      - run:
-          name: deploy kube-state-metrics
-          command: kubectl apply -f metrics-apis/kube-state-metrics --recursive
+          name: deploy metrics-apis
+          command: kubectl apply -f metrics-apis --recursive
       # - run:
       #     name: deploy cluster-autoscaler
       #     command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
