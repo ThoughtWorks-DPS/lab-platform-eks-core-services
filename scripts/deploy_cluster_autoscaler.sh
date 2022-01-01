@@ -197,4 +197,4 @@ spec:
             path: "/etc/ssl/certs/ca-bundle.crt"
 EOF
 
-kubectl apply -n kube-system -f cluster-autoscaler-deployment.yaml
+kubectl apply -f cluster-autoscaler --recursive
