@@ -8,7 +8,7 @@ cat <<EOF > cluster-autoscaler/service-account.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ${CLUSTER}-cluster-autoscaler
+  name: cluster-autoscaler
   namespace: kube-system
   labels:
     app: cluster-autoscaler
