@@ -194,8 +194,65 @@ workflows:
             - deploy-sandbox-core-services
           filters: *on-push-main
 
+      # release to preview cluster
+      - terraform/apply:
+          name: apply-preview-core-service-roles
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
+          workspace: preview
+          terraform-version: << pipeline.parameters.terraform-version >>
+          before-terraform:
+            - set-environment:
+                cluster: preview
+          filters: *on-tag-main
+
+      - deploy-core-services:
+          name: deploy-preview-core-services
+          context: << pipeline.parameters.context >>
+          cluster: preview
+          requires:
+            - apply-preview-core-service-roles
+          filters: *on-tag-main
+
+      - validate-core-services:
+          name: validate-preview-core-services
+          context: << pipeline.parameters.context >>
+          cluster: preview
+          requires:
+            - deploy-preview-core-services
+          filters: *on-tag-main
+
+  generate-release-notes:
+    jobs:
+      - executor-tools/release:
+          name: release-lab-platform-eks-core-services
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
+          filters: *on-tag-main
+
+  # perform the pipeline health checks and compare desired core service versions with current release versions
+  nightly-validation:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - validate-core-services:
+          name: validate-sandbox-cluster
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
       - version-check:
           name: check-sandbox-core-services-versions
           context: << pipeline.parameters.context >>
           cluster: sandbox
-          filters: *on-push-main
+      - validate-core-services:
+          name: validate-preview-cluster
+          context: << pipeline.parameters.context >>
+          cluster: preview
+      - version-check:
+          name: check-preview-acore-services-versions
+          context: << pipeline.parameters.context >>
+          cluster: preview

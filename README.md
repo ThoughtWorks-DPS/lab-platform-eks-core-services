@@ -19,6 +19,7 @@
 
 ### version updates
 
+A nightly job runs health and versions checks. View log output for new version information.  
 
 ### lab-system
 
