@@ -189,7 +189,7 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: sandbox
           requires:
-            - deploy-core-services
+            - deploy-sandbox-core-services
           filters: *on-push-main
 
       - version-check:
