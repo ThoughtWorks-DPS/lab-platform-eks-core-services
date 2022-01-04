@@ -106,17 +106,57 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
-          name: deploy metrics-apis
-          command: kubectl apply -f metrics-apis --recursive
+          name: deploy metrics-server
+          command: bash scripts/deploy_metrics_server.sh sandbox
+      - run:
+          name: deploy kube-state-metrics
+          command: bash scripts/deploy_kube_state_metrics.sh sandbox
       - run:
           name: deploy cluster-autoscaler
           command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
       - run:
           name: deploy system namespaces and roles
           command: kubectl apply -f system-ns-and-roles --recursive
+
+  validate-core-services:
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    parameters:
+      cluster:
+        description: cluster to configure
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
       - run:
           name: smoketest core services
           command: bash scripts/core_services_health_check.sh << parameters.cluster >>
+      - run:
+          name: conformance tests
+          command: bash scripts/sonobuoy_conformance_test.sh sandbox quick
+
+  version-check:
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    parameters:
+      cluster:
+        description: cluster to configure
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: install python script requirements
+          command: pip install -r requirements.txt
+      - run:
+          name: smoketest core services
+          command: python scripts/versions.py
 
 workflows:
   version: 2
@@ -142,4 +182,18 @@ workflows:
           cluster: sandbox
           requires:
             - apply-sandbox-core-service-roles
+          filters: *on-push-main
+
+      - validate-core-services:
+          name: validate-sandbox-core-services
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+          requires:
+            - deploy-core-services
+          filters: *on-push-main
+
+      - version-check:
+          name: check-sandbox-core-services-versions
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
           filters: *on-push-main

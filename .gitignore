@@ -2,3 +2,4 @@ sandbox.auto.tfvars.json
 kubeconfig_sandbox
 .terraform
 .terraform.*
+.python-version

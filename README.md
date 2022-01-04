@@ -12,10 +12,13 @@
 
 * metrics-server (v0.5.2)
 * kube-state-metrics (v2.3.0)
-* cluster-autoscaler (eks_version)
+* cluster-autoscaler (v1.21.2)
 * create core system namespaces and roles
   * ns: lab-system
   * role: admin-clusterrole
+
+### version updates
+
 
 ### lab-system
 

@@ -6,7 +6,7 @@ locals {
 # cluster-autoscaler
 module "assumable_role_cluster_autoscaler" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version = "4.7.0"
+  version = "4.1.0"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cluster-autoscaler"
@@ -33,6 +33,7 @@ data "aws_iam_policy_document" "cluster_autoscaler_role_policy_document" {
       "autoscaling:DescribeLaunchConfigurations",
       "autoscaling:DescribeTags",
       "ec2:DescribeLaunchTemplateVersions",
+      "ec2:DescribeInstanceTypes"
     ]
 
     resources = ["*"]
