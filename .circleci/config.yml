@@ -107,10 +107,10 @@ jobs:
           cluster: << parameters.cluster >>
       - run:
           name: deploy metrics-server
-          command: bash scripts/deploy_metrics_server.sh sandbox
+          command: bash scripts/deploy_metrics_server.sh << parameters.cluster >>
       - run:
           name: deploy kube-state-metrics
-          command: bash scripts/deploy_kube_state_metrics.sh sandbox
+          command: bash scripts/deploy_kube_state_metrics.sh << parameters.cluster >>
       - run:
           name: deploy cluster-autoscaler
           command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
@@ -138,7 +138,7 @@ jobs:
           command: bash scripts/core_services_health_check.sh << parameters.cluster >>
       - run:
           name: conformance tests
-          command: bash scripts/sonobuoy_conformance_test.sh sandbox quick
+          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> quick
 
   version-check:
     docker:
