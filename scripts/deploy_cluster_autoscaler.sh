@@ -333,4 +333,4 @@ spec:
   maxUnavailable: 1
 EOF
 
-# kubectl apply -f cluster-autoscaler --recursive
+kubectl apply -f cluster-autoscaler --recursive
