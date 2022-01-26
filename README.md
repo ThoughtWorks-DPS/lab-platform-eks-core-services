@@ -5,6 +5,7 @@
 		<img alt="DPS Title" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/dps_lab_title.png?sanitize=true" width=350/>
 	</p>
   <h3>lab-platform-eks-core-services</h3>
+    <a href="https://app.circleci.com/pipelines/github/ThoughtWorks-DPS/lab-platform-eks-core-services"><img src="https://circleci.com/gh/ThoughtWorks-DPS/lab-platform-eks-core-services.svg?style=shield"></a> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 </div>
 <br />
 
@@ -13,6 +14,10 @@
 * metrics-server
 * kube-state-metrics
 * cluster-autoscaler
+* aws-efs-csi-driver (pending)
+* datadog agents (pending)
+  * core eks system-level monitoring
+  * Eks, Addons, core system service version check and alerting
 * create core system namespaces and roles
   * ns: lab-system
   * role: admin-clusterrole
