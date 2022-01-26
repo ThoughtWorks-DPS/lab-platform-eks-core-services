@@ -10,9 +10,9 @@
 
 ## current configuration
 
-* metrics-server (v0.5.2)
-* kube-state-metrics (v2.3.0)
-* cluster-autoscaler (v1.21.2)
+* metrics-server
+* kube-state-metrics
+* cluster-autoscaler
 * create core system namespaces and roles
   * ns: lab-system
   * role: admin-clusterrole

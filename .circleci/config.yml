@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   # can override kubectl, awspec versions as necessary
-  kube: twdps/kube-ops@dev:latest
+  kube: twdps/kube-ops@0.1.0
   # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
@@ -22,7 +22,7 @@ parameters:
   terraform-version:
     description: terraform version for all jobs
     type: string
-    default: "1.1.2"
+    default: "1.1.4"
   executor-image:
     description: image to use for local jobs
     type: string
@@ -106,6 +106,9 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
+          name: deploy system namespaces and roles
+          command: kubectl apply -f system-ns-and-roles --recursive
+      - run:
           name: deploy metrics-server
           command: bash scripts/deploy_metrics_server.sh << parameters.cluster >>
       - run:
@@ -114,9 +117,7 @@ jobs:
       - run:
           name: deploy cluster-autoscaler
           command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
-      - run:
-          name: deploy system namespaces and roles
-          command: kubectl apply -f system-ns-and-roles --recursive
+
 
   validate-core-services:
     docker:
@@ -231,28 +232,28 @@ workflows:
           filters: *on-tag-main
 
   # perform the pipeline health checks and compare desired core service versions with current release versions
-  nightly-validation:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - validate-core-services:
-          name: validate-sandbox-cluster
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
-      - version-check:
-          name: check-sandbox-core-services-versions
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
-      - validate-core-services:
-          name: validate-preview-cluster
-          context: << pipeline.parameters.context >>
-          cluster: preview
-      - version-check:
-          name: check-preview-acore-services-versions
-          context: << pipeline.parameters.context >>
-          cluster: preview
+  # nightly-validation:
+  #   triggers:
+  #     - schedule:
+  #         cron: "0 0 * * *"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - main
+  #   jobs:
+  #     - validate-core-services:
+  #         name: validate-sandbox-cluster
+  #         context: << pipeline.parameters.context >>
+  #         cluster: sandbox
+  #     - version-check:
+  #         name: check-sandbox-core-services-versions
+  #         context: << pipeline.parameters.context >>
+  #         cluster: sandbox
+  #     - validate-core-services:
+  #         name: validate-preview-cluster
+  #         context: << pipeline.parameters.context >>
+  #         cluster: preview
+  #     - version-check:
+  #         name: check-preview-acore-services-versions
+  #         context: << pipeline.parameters.context >>
+  #         cluster: preview

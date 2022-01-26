@@ -2,7 +2,27 @@
 export CLUSTER=$1
 export KUBE_STATE_METRICS_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .kube_state_metrics_version)
 
-cat <<EOF > kube-state-metrics/rbac.yaml
+cat <<EOF > kube-state-metrics/cluster-role-binding.yaml
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/version: ${KUBE_STATE_METRICS_VERSION}
+  name: kube-state-metrics
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-state-metrics
+subjects:
+- kind: ServiceAccount
+  name: kube-state-metrics
+  namespace: kube-system
+EOF
+
+cat <<EOF > kube-state-metrics/cluster-role.yaml
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -10,7 +30,7 @@ metadata:
   labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: "$KUBE_STATE_METRICS_VERSION"
+    app.kubernetes.io/version: ${KUBE_STATE_METRICS_VERSION}
   name: kube-state-metrics
 rules:
 - apiGroups:
@@ -113,24 +133,6 @@ rules:
   verbs:
   - list
   - watch
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: "$KUBE_STATE_METRICS_VERSION"
-  name: kube-state-metrics
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: kube-state-metrics
-subjects:
-- kind: ServiceAccount
-  name: kube-state-metrics
-  namespace: kube-system
 EOF
 
 cat <<EOF > kube-state-metrics/deployment.yaml
@@ -141,7 +143,7 @@ metadata:
   labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: "$KUBE_STATE_METRICS_VERSION"
+    app.kubernetes.io/version: ${KUBE_STATE_METRICS_VERSION}
   name: kube-state-metrics
   namespace: kube-system
 spec:
@@ -154,10 +156,11 @@ spec:
       labels:
         app.kubernetes.io/component: exporter
         app.kubernetes.io/name: kube-state-metrics
-        app.kubernetes.io/version: "$KUBE_STATE_METRICS_VERSION"
+        app.kubernetes.io/version: ${KUBE_STATE_METRICS_VERSION}
     spec:
+      automountServiceAccountToken: true
       containers:
-      - image: k8s.gcr.io/kube-state-metrics/kube-state-metrics:v$KUBE_STATE_METRICS_VERSION
+      - image: k8s.gcr.io/kube-state-metrics/kube-state-metrics:v${KUBE_STATE_METRICS_VERSION}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -181,6 +184,21 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       serviceAccountName: kube-state-metrics
+
+EOF
+
+cat <<EOF > kube-state-metrics/service-account.yaml
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/version: ${KUBE_STATE_METRICS_VERSION}
+  name: kube-state-metrics
+  namespace: kube-system
 EOF
 
 cat <<EOF > kube-state-metrics/service.yaml
@@ -191,7 +209,7 @@ metadata:
   labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: "$KUBE_STATE_METRICS_VERSION"
+    app.kubernetes.io/version: ${KUBE_STATE_METRICS_VERSION}
   name: kube-state-metrics
   namespace: kube-system
 spec:
@@ -205,20 +223,6 @@ spec:
     targetPort: telemetry
   selector:
     app.kubernetes.io/name: kube-state-metrics
-
-EOF
-
-cat <<EOF > kube-state-metrics/service-account.yaml
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics
-    app.kubernetes.io/version: "$KUBE_STATE_METRICS_VERSION"
-  name: kube-state-metrics
-  namespace: kube-system
 EOF
 
 kubectl apply -f kube-state-metrics/ --recursive

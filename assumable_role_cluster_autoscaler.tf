@@ -1,18 +1,12 @@
-locals {
-  cluster_autoscaler_namespace            = "kube-system"
-  cluster_autoscaler_service_account_name = "${var.cluster_name}-cluster-autoscaler"
-}
-
-# cluster-autoscaler
 module "assumable_role_cluster_autoscaler" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version = "4.1.0"
+  version = "~>4.7"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cluster-autoscaler"
   provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   role_policy_arns              = [aws_iam_policy.cluster_autoscaler_role_policy.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cluster_autoscaler_namespace}:${local.cluster_autoscaler_service_account_name}"]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:cluster-autoscaler"]
   number_of_role_policy_arns    = 1
 }
 
@@ -24,7 +18,6 @@ resource "aws_iam_policy" "cluster_autoscaler_role_policy" {
 
 data "aws_iam_policy_document" "cluster_autoscaler_role_policy_document" {
   statement {
-    sid    = "${var.cluster_name}ClusterAutoscalerAll"
     effect = "Allow"
 
     actions = [
@@ -40,7 +33,6 @@ data "aws_iam_policy_document" "cluster_autoscaler_role_policy_document" {
   }
 
   statement {
-    sid    = "${var.cluster_name}ClusterAutoscalerOwn"
     effect = "Allow"
 
     actions = [
