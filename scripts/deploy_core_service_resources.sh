@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 export CLUSTER=$1
-export EFS_FILESYSTEM_ID=$(cat eks_efs_csi_storage_id)
+export TF_WORKSPACE=$CLUSTER
+
+terraform init
+export EFS_FILESYSTEM_ID=$(terraform output eks_efs_csi_storage_id)
 
 
-cat <<EOF > core-service-resources/ebs-storage-class.yaml
+cat <<EOF > core-services-resources/ebs-storage-class.yaml
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
@@ -21,7 +24,7 @@ parameters:
 
 EOF
 
-cat <<EOF > core-service-resources/efs-storage-class.yaml
+cat <<EOF > core-services-resources/efs-storage-class.yaml
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
@@ -35,4 +38,4 @@ parameters:
   basePath: "/${CLUSTER}_dynamic"
 EOF
 
-kubectl apply -f core-service-resources --recursive
+kubectl apply -f core-services-resources --recursive
