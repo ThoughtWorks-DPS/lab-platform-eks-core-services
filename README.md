@@ -14,13 +14,15 @@
 * metrics-server
 * kube-state-metrics
 * cluster-autoscaler
-* aws-efs-csi-driver (pending)
+* aws-efs-csi-driver
 * datadog agents (pending)
   * core eks system-level monitoring
   * Eks, Addons, core system service version check and alerting
-* create core system namespaces and roles
+* create core system resources
   * ns: lab-system
   * role: admin-clusterrole
+  * efs storage class
+  * ebs storage class
 
 ### version updates
 
