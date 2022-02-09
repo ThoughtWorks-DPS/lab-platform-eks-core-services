@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export CLUSTER=$1
-export EFS_FILESYSTEM_ID=$(terraform output eks_efs_csi_storage_id)
+export EFS_FILESYSTEM_ID=$(cat eks_efs_csi_storage_id)
 
 
 cat <<EOF > core-service-resources/ebs-storage-class.yaml
