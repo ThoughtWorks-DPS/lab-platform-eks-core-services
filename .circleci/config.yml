@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   # can override kubectl, awspec versions as necessary
-  kube: twdps/kube-ops@0.1.0
+  kube: twdps/kube-ops@dev:latest
   # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
@@ -84,6 +84,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - kube/packages:
+          terraform_version: << pipeline.parameters.terraform-version >>
       - set-environment:
           cluster: << parameters.cluster >>
       - set-kubeconfig:
