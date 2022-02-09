@@ -22,12 +22,22 @@ EOF
 cp tpl/efs-csi-deployment.yaml.tpl efs-csi-driver/deployment.yaml
 cp tpl/efs-csi-daemonset.yaml.tpl efs-csi-driver/daemonset.yaml
 
-gsed -i "s/EFS_CSI_DRIVER_VERSION/$EFS_CSI_DRIVER_VERSION/g" efs-csi-driver/deployment.yaml
-gsed -i "s/CSI_PROVISIONER_VERSION/$CSI_PROVISIONER_VERSION/g" efs-csi-driver/deployment.yaml
-gsed -i "s/LIVENESS_PROBE_VERSION/$LIVENESS_PROBE_VERSION/g" efs-csi-driver/deployment.yaml
+if [[ uname == "Darwin" ]]; then
+  gsed -i "s/EFS_CSI_DRIVER_VERSION/$EFS_CSI_DRIVER_VERSION/g" efs-csi-driver/deployment.yaml
+  gsed -i "s/CSI_PROVISIONER_VERSION/$CSI_PROVISIONER_VERSION/g" efs-csi-driver/deployment.yaml
+  gsed -i "s/LIVENESS_PROBE_VERSION/$LIVENESS_PROBE_VERSION/g" efs-csi-driver/deployment.yaml
 
-gsed -i "s/EFS_CSI_DRIVER_VERSION/$EFS_CSI_DRIVER_VERSION/g" efs-csi-driver/daemonset.yaml
-gsed -i "s/CSI_NODE_DRIVER_REGISTRAR/$CSI_NODE_DRIVER_REGISTRAR/g" efs-csi-driver/daemonset.yaml
-gsed -i "s/LIVENESS_PROBE_VERSION/$LIVENESS_PROBE_VERSION/g" efs-csi-driver/daemonset.yaml
+  gsed -i "s/EFS_CSI_DRIVER_VERSION/$EFS_CSI_DRIVER_VERSION/g" efs-csi-driver/daemonset.yaml
+  gsed -i "s/CSI_NODE_DRIVER_REGISTRAR/$CSI_NODE_DRIVER_REGISTRAR/g" efs-csi-driver/daemonset.yaml
+  gsed -i "s/LIVENESS_PROBE_VERSION/$LIVENESS_PROBE_VERSION/g" efs-csi-driver/daemonset.yaml
+else 
+  sed -i "s/EFS_CSI_DRIVER_VERSION/$EFS_CSI_DRIVER_VERSION/g" efs-csi-driver/deployment.yaml
+  sed -i "s/CSI_PROVISIONER_VERSION/$CSI_PROVISIONER_VERSION/g" efs-csi-driver/deployment.yaml
+  sed -i "s/LIVENESS_PROBE_VERSION/$LIVENESS_PROBE_VERSION/g" efs-csi-driver/deployment.yaml
+
+  sed -i "s/EFS_CSI_DRIVER_VERSION/$EFS_CSI_DRIVER_VERSION/g" efs-csi-driver/daemonset.yaml
+  sed -i "s/CSI_NODE_DRIVER_REGISTRAR/$CSI_NODE_DRIVER_REGISTRAR/g" efs-csi-driver/daemonset.yaml
+  sed -i "s/LIVENESS_PROBE_VERSION/$LIVENESS_PROBE_VERSION/g" efs-csi-driver/daemonset.yaml
+fi
 
 kubectl apply -f efs-csi-driver --recursive
