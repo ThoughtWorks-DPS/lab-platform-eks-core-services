@@ -123,7 +123,7 @@ jobs:
           cluster: << parameters.cluster >>
       - run:
           name: smoketest core services
-          command: bash scripts/core_services_health_check.sh << parameters.cluster >>
+          command: bash scripts/validate_core_services.sh << parameters.cluster >>
       - run:
           name: conformance tests
           command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> quick
