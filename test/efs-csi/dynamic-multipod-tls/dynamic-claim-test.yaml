@@ -1,0 +1,54 @@
+# ======================= team one
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-efs-claim
+  namespace: test-efs-csi
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-csi-test-storage-class
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: claim-test-pod-1
+  namespace: test-efs-csi
+spec:
+  containers:
+  - name: app1
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo $(date -u) >> /data/out1; sleep 5; done"]
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: test-efs-claim
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: claim-test-pod-2
+  namespace: test-efs-csi
+spec:
+  containers:
+  - name: app2
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo 'hello from pod2' >> /data/out2; sleep 5; done"]
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: test-efs-claim

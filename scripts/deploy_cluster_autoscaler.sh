@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 export CLUSTER=$1
 export CLUSTER_AUTOSCALER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .cluster_autoscaler_version)
+export ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 
 cat <<EOF > cluster-autoscaler/service-account.yaml
 ---
@@ -13,7 +14,7 @@ metadata:
   name: cluster-autoscaler
   namespace: kube-system
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::090950721693:role/$CLUSTER-cluster-autoscaler
+    eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/$CLUSTER-cluster-autoscaler
 # automountServiceAccountToken: true
 EOF
 

@@ -22,11 +22,11 @@ parameters:
   terraform-version:
     description: terraform version for all jobs
     type: string
-    default: "1.1.4"
+    default: "1.1.5"
   executor-image:
     description: image to use for local jobs
     type: string
-    default: twdps/circleci-kube-ops:alpine-0.4.0
+    default: twdps/circleci-kube-ops:alpine-0.5.0
 
 # git push: deploy sandbox
 on-push-main: &on-push-main
@@ -73,23 +73,6 @@ commands:
 
 jobs:
 
-  create-custom-system-namespaces:
-    parameters:
-      cluster:
-        description: cluster being configured
-        type: string
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << pipeline.parameters.shell-options >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-kubeconfig:
-          cluster: << parameters.cluster >>
-      - run:
-          name: Create custom system namespaces
-          command: kubectl apply -f standard-system-namespaces.yaml
-
   deploy-core-services:
     docker:
       - image: << pipeline.parameters.executor-image >>
@@ -106,9 +89,6 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
-          name: deploy system namespaces and roles
-          command: kubectl apply -f system-ns-and-roles --recursive
-      - run:
           name: deploy metrics-server
           command: bash scripts/deploy_metrics_server.sh << parameters.cluster >>
       - run:
@@ -117,7 +97,12 @@ jobs:
       - run:
           name: deploy cluster-autoscaler
           command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
-
+      - run:
+          name: deploy aws-efs-csi-driver
+          command: bash scripts/deploy_efs_csi_driver.sh << parameters.cluster >>
+      - run:
+          name: deploy core-services-resources
+          command: bash scripts/deploy_core_service_resources.sh << parameters.cluster >>
 
   validate-core-services:
     docker:
