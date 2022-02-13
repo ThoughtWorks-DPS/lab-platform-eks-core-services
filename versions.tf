@@ -22,3 +22,4 @@ provider "aws" {
     session_name = "lab-platform-eks-core-services"
   }
 }
+

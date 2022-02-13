@@ -9,6 +9,10 @@
     "kube_state_metrics_version": "2.3.0",
     "aws_efs_csi_driver_version": "1.3.6",
     "aws_efs_csi_provisionser_version": "2.1.1",
-    "aws_eks_liveness_probe_version": "2.2.0",
-    "aws_efs_csi_node_driver_registrar": "2.1.0"
+    "aws_eks_liveness_probe_version": "2.4.0",
+    "aws_efs_csi_node_driver_registrar": "2.1.0",
+    "datadog_api_key": "{{ twdps/di/svc/datadog/api-key }}",
+    "datadog_app_key": "{{ twdps/di/svc/datadog/app-key }}",
+    "datadog_cluster_agent_version": "1.17.0",
+    "datadpg_agent_version": "7.33.0"
 }

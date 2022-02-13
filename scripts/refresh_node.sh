@@ -30,11 +30,16 @@ printf '%s\n' "${REPLACENODES[@]}"
 
 for i in "${REPLACENODES[@]}"
 do
-        echo Replacing $i
+        echo "Replacing $i"
+        kubectl cordon $i
         kubectl drain $i --ignore-daemonsets --delete-emptydir-data
 
+        # after 30 seconds or so, things that respond to eviction will have been removed from this node
+        # need to add step to pull and list any pods that do not respond, alerting the associated customer team
+        sleep 30
+
         INSTANCE_ID=$(aws ec2 describe-instances --filter Name=private-dns-name,Values=$i --profile $AWS_ASSUME_ROLE | jq -r '.Reservations[].Instances[] | .InstanceId')
-        aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --profile $AWS_ASSUME_ROLE
+        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --profile $AWS_ASSUME_ROLE
 
         CURRENT_READY_NODE_COUNT=$(kubectl get nodes | awk '{ print $2 }' | grep -E '(^|\s)Ready($|\s)' | wc -l)
 

@@ -29,7 +29,7 @@ spec:
         env:
         - name: CSI_ENDPOINT
           value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
-        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-efs-csi-driver:v1.3.6
+        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-efs-csi-driver:vEFS_CSI_DRIVER_VERSION
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 5
@@ -58,7 +58,7 @@ spec:
         env:
         - name: ADDRESS
           value: /var/lib/csi/sockets/pluginproxy/csi.sock
-        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/csi-provisioner:v2.1.1
+        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/csi-provisioner:vCSI_PROVISIONER_VERSION
         imagePullPolicy: IfNotPresent
         name: csi-provisioner
         volumeMounts:
@@ -67,7 +67,7 @@ spec:
       - args:
         - --csi-address=/csi/csi.sock
         - --health-port=9909
-        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/livenessprobe:v2.4.0
+        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/livenessprobe:vLIVENESS_PROBE_VERSION
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         volumeMounts:

@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 kubernetes = "==21.7.0"
 requests = "==2.27.0"
+datadog = "*"
 
 [dev-packages]
 

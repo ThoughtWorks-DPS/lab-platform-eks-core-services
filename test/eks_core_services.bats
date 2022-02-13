@@ -1,13 +1,23 @@
 #!/usr/bin/env bats
 
-@test "validate metrics-server status" {
+@test "validate metrics-server version" {
   run bash -c "kubectl get deployment metrics-server -n kube-system -o json | grep $DESIRED_METRICS_SERVER_VERSION"
   [[ "${output}" =~ "metrics-server" ]]
 }
 
-@test "validate kube-state-metrics status" {
+@test "validate metrics-server status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'metrics-server'"
+  [[ "${output}" =~ "Running" ]]
+}
+
+@test "validate kube-state-metrics version" {
   run bash -c "kubectl get deployment kube-state-metrics -n kube-system -o json | grep $DESIRED_KUBE_STATE_METRICS_VERSION"
   [[ "${output}" =~ "kube-state-metrics" ]]
+}
+
+@test "validate kube-state-metrics status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'kube-state-metrics'"
+  [[ "${output}" =~ "Running" ]]
 }
 
 @test "validate cluster-autoscaler status" {
@@ -15,32 +25,42 @@
   [[ "${output}" =~ "cluster-autoscaler" ]]
 }
 
+@test "validate cluster-autoscaler status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'cluster-autoscaler'"
+  [[ "${output}" =~ "Running" ]]
+}
+
 @test "validate efs-csi-controller status" {
   run bash -c "kubectl get deployment efs-csi-controller -n kube-system -o json | grep $EFS_CSI_DRIVER_VERSION"
   [[ "${output}" =~ "aws-efs-csi-driver" ]]
 }
 
-@test "validate efs-csi-controller provisioner status" {
+@test "validate efs-csi-controller provisioner version" {
   run bash -c "kubectl get deployment efs-csi-controller -n kube-system -o json | grep $CSI_PROVISIONER_VERSION"
   [[ "${output}" =~ "csi-provisioner" ]]
 }
 
-@test "validate efs-csi-controller liveness probe status" {
+@test "validate efs-csi-controller status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'efs-csi-controller'"
+  [[ "${output}" =~ "Running" ]]
+}
+
+@test "validate efs-csi-controller liveness probe version" {
   run bash -c "kubectl get deployment efs-csi-controller -n kube-system -o json | grep $LIVENESS_PROBE_VERSION"
   [[ "${output}" =~ "livenessprobe" ]]
 }
 
-@test "validate efs-csi-node status" {
+@test "validate efs-csi-node version" {
   run bash -c "kubectl get daemonset efs-csi-node -n kube-system -o json | grep $EFS_CSI_DRIVER_VERSION"
   [[ "${output}" =~ "aws-efs-csi-driver" ]]
 }
 
-@test "validate efs-csi-node registrar status" {
+@test "validate efs-csi-node registrar version" {
   run bash -c "kubectl get daemonset efs-csi-node -n kube-system -o json | grep $CSI_NODE_DRIVER_REGISTRAR"
   [[ "${output}" =~ "csi-node-driver-registrar" ]]
 }
 
-@test "validate efs-csi-node liveness probe status" {
+@test "validate efs-csi-node liveness probe version" {
   run bash -c "kubectl get daemonset efs-csi-node -n kube-system -o json | grep $LIVENESS_PROBE_VERSION"
   [[ "${output}" =~ "livenessprobe" ]]
 }
@@ -55,6 +75,7 @@
   [[ "${output}" =~ "Immediate" ]]
 }
 
+
 @test "evaluate standard namespaces" {
   run bash -c "kubectl get ns"
   [[ "${output}" =~ "lab-system" ]]
@@ -64,3 +85,7 @@
   run bash -c "kubectl get clusterroles"
   [[ "${output}" =~ "admin-clusterrole" ]]
 }
+
+kubectl get pods | grep agent
+kubectl get pods | grep 'cluster-agent
+

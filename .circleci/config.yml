@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   # can override kubectl, awspec versions as necessary
-  kube: twdps/kube-ops@dev:latest
+  kube: twdps/kube-ops@0.2.0
   # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
@@ -23,6 +23,10 @@ parameters:
     description: terraform version for all jobs
     type: string
     default: "1.1.5"
+  datadog-version:
+    description: datadog cli version for all jobs
+    type: string
+    default: "0.43.0"
   executor-image:
     description: image to use for local jobs
     type: string
@@ -86,6 +90,7 @@ jobs:
       - setup_remote_docker
       - kube/packages:
           terraform-version: << pipeline.parameters.terraform-version >>
+          datadog-version: << pipeline.parameters.datadog-version >>
       - set-environment:
           cluster: << parameters.cluster >>
       - set-kubeconfig:
@@ -103,8 +108,14 @@ jobs:
           name: deploy aws-efs-csi-driver
           command: bash scripts/deploy_efs_csi_driver.sh << parameters.cluster >>
       - run:
+          name: deploy datadog agents
+          command: bash scrtips/deploy_datadog_agent.sh << parameters.cluster >>
+      - run:
           name: deploy core-services-resources
           command: bash scripts/deploy_core_service_resources.sh << parameters.cluster >>
+      - run:
+          name: post deployment event to datadog
+          command: dog event post --tags "cluster:sandbox, deployment:lab-platform-eks-core-services" Deploy 'lab-platform-eks-core-services'
 
   validate-core-services:
     docker:
@@ -147,6 +158,25 @@ jobs:
       - run:
           name: smoketest core services
           command: python scripts/versions.py
+
+  refresh-nodes:
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    parameters:
+      cluster:
+        description: cluster to configure
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: << parameters.cluster >>
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: cordon, drain, and delete 1/4 of the node group nodes
+          command: bash scripts/refresh_nodes.sh << parameters.cluster >>
 
 workflows:
   version: 2
@@ -218,29 +248,28 @@ workflows:
           shell: << pipeline.parameters.shell-options >>
           filters: *on-tag-main
 
-  # perform the pipeline health checks and compare desired core service versions with current release versions
-  # nightly-validation:
-  #   triggers:
-  #     - schedule:
-  #         cron: "0 0 * * *"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - main
-  #   jobs:
-  #     - validate-core-services:
-  #         name: validate-sandbox-cluster
-  #         context: << pipeline.parameters.context >>
-  #         cluster: sandbox
-  #     - version-check:
-  #         name: check-sandbox-core-services-versions
-  #         context: << pipeline.parameters.context >>
-  #         cluster: sandbox
-  #     - validate-core-services:
-  #         name: validate-preview-cluster
-  #         context: << pipeline.parameters.context >>
-  #         cluster: preview
-  #     - version-check:
-  #         name: check-preview-acore-services-versions
-  #         context: << pipeline.parameters.context >>
-  #         cluster: preview
+  nightly-validation:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - refresh-nodes:
+          name: refresh-sandbox-nodes
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+      - refresh-nodes:
+          name: refresh-preview-nodes
+          context: << pipeline.parameters.context >>
+          cluster: preview
+      - validate-core-services:
+          name: validate-sandbox-cluster
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+      - validate-core-services:
+          name: validate-preview-cluster
+          context: << pipeline.parameters.context >>
+          cluster: preview

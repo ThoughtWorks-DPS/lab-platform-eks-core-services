@@ -36,7 +36,7 @@ spec:
         env:
         - name: CSI_ENDPOINT
           value: unix:/csi/csi.sock
-        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-efs-csi-driver:v1.3.6
+        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/aws-efs-csi-driver:vEFS_CSI_DRIVER_VERSION
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 5
@@ -78,7 +78,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/csi-node-driver-registrar:v2.1.0
+        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/csi-node-driver-registrar:vCSI_NODE_DRIVER_REGISTRAR
         imagePullPolicy: IfNotPresent
         name: csi-driver-registrar
         volumeMounts:
@@ -90,7 +90,7 @@ spec:
         - --csi-address=/csi/csi.sock
         - --health-port=9809
         - --v=2
-        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/livenessprobe:v2.4.0
+        image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/eks/livenessprobe:vLIVENESS_PROBE_VERSION
         imagePullPolicy: IfNotPresent
         name: liveness-probe
         volumeMounts:
