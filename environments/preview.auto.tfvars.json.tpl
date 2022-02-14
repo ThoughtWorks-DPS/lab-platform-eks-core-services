@@ -14,6 +14,6 @@
     "datadog_api_key": "{{ twdps/di/svc/datadog/api-key }}",
     "datadog_app_key": "{{ twdps/di/svc/datadog/app-key }}",
     "datadog_cluster_agent_version": "1.17.0",
-    "datadpg_agent_version": "7.33.0"
+    "datadog_agent_version": "7.33.0"
 }
 
