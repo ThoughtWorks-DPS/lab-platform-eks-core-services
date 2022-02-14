@@ -4,3 +4,4 @@ kubeconfig*
 .terraform.*
 .python-version
 Pipfile.lock
+datadog/values.yaml
