@@ -109,7 +109,7 @@ jobs:
           command: bash scripts/deploy_efs_csi_driver.sh << parameters.cluster >>
       - run:
           name: deploy datadog agents
-          command: bash scrtips/deploy_datadog_agent.sh << parameters.cluster >>
+          command: bash scripts/deploy_datadog_agent.sh << parameters.cluster >>
       - run:
           name: deploy core-services-resources
           command: bash scripts/deploy_core_service_resources.sh << parameters.cluster >>
@@ -261,15 +261,15 @@ workflows:
           name: refresh-sandbox-nodes
           context: << pipeline.parameters.context >>
           cluster: sandbox
-      - refresh-nodes:
-          name: refresh-preview-nodes
-          context: << pipeline.parameters.context >>
-          cluster: preview
+      # - refresh-nodes:
+      #     name: refresh-preview-nodes
+      #     context: << pipeline.parameters.context >>
+      #     cluster: preview
       - validate-core-services:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
-      - validate-core-services:
-          name: validate-preview-cluster
-          context: << pipeline.parameters.context >>
-          cluster: preview
+      # - validate-core-services:
+      #     name: validate-preview-cluster
+      #     context: << pipeline.parameters.context >>
+      #     cluster: preview
