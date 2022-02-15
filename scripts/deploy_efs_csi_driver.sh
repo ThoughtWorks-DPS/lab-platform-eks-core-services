@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 export CLUSTER=$1
 export ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 export EFS_CSI_DRIVER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_efs_csi_driver_version)

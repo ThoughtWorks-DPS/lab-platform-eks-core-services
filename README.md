@@ -42,3 +42,5 @@ The `admin-clusterrole` is created with the default system:admin permissions and
 **nightly job** include node refresh. 1/4 of nodes are cordened, drained, then deleted. The ASG will replce with a fresh copy of the ami defined in the current asg. Note, this it not the same as the lastest available AMI. Run the full pipeline to create a new asg wth the latest, patched version of the aws eks optimized node.  
 
 **aws_eks_liveness_probe_version** set to v2.4.0: The default version expected by the version of the efs-csi-driver being installed would be v2.2.0 however this throws continuous `I0209 14:51:20.515055       1 connection.go:153] Connecting to unix:///csi/csi.sock` errors. The same version of the liveness probe is being used by the ebs-csi EKS addon. See the lab-platform-eks-base repository for the current test of manually overriding that version.   
+
+**sonobuoy conformance test** has been commented out in the pipeline. We've previously demonstrated this as part of core services however, argueably the better time to introduce is when you begin to deploy your own custom resource definitions.  

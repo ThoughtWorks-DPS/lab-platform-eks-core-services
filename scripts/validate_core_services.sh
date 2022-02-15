@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 export CLUSTER=$1
 export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
@@ -22,6 +24,9 @@ bats test
 
 echo "validate EFS storage class"
 # validate dynamic volume provisioning with mulitipod access
+
+echo "debug:"
+cat test/efs-csi/test-efs-storage-class.yaml
 
 kubectl apply -f test/efs-csi/test-efs-storage-class.yaml
 sleep 10

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 export CLUSTER=$1
 export SONOBUOY_MODE=$2
 

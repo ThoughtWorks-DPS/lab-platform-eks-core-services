@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 
 # the resulting chart needs changes in order to be deployed.
 # get, update need to be added to the clusterrole permissions for configmaps

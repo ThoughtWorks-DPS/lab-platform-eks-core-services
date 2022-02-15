@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 export CLUSTER=$1
 export CLUSTER_AUTOSCALER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .cluster_autoscaler_version)
 export ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)

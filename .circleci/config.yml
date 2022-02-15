@@ -135,9 +135,9 @@ jobs:
       - run:
           name: smoketest core services
           command: bash scripts/validate_core_services.sh << parameters.cluster >>
-      - run:
-          name: conformance tests
-          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> quick
+      # - run:
+      #     name: conformance tests
+      #     command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> quick
 
   version-check:
     docker:

@@ -89,11 +89,11 @@
 }
 
 @test "validate datadog-agent status" {
-  run bash -c "kubectl get po -n kube-system -o wide | grep 'datadog-agent'"
+  run bash -c "kubectl get po -n datadog -o wide | grep 'datadog-agent'"
   [[ "${output}" =~ "Running" ]]
 }
 
 @test "validate datadog-cluster-agent status" {
-  run bash -c "kubectl get po -n kube-system -o wide | grep 'datadog-cluster-agent'"
+  run bash -c "kubectl get po -n datadog -o wide | grep 'datadog-cluster-agent'"
   [[ "${output}" =~ "Running" ]]
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 export CLUSTER=$1
 export TF_WORKSPACE=$CLUSTER
 
