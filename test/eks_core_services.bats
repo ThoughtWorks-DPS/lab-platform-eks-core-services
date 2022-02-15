@@ -10,6 +10,7 @@
   [[ "${output}" =~ "Running" ]]
 }
 
+
 @test "validate kube-state-metrics version" {
   run bash -c "kubectl get deployment kube-state-metrics -n kube-system -o json | grep $DESIRED_KUBE_STATE_METRICS_VERSION"
   [[ "${output}" =~ "kube-state-metrics" ]]
@@ -20,7 +21,8 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-@test "validate cluster-autoscaler status" {
+
+@test "validate cluster-autoscaler version" {
   run bash -c "kubectl get deployment cluster-autoscaler -n kube-system -o json | grep $DESIRED_CLUSTER_AUTOSCALER_VERSION"
   [[ "${output}" =~ "cluster-autoscaler" ]]
 }
@@ -30,7 +32,8 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-@test "validate efs-csi-controller status" {
+
+@test "validate efs-csi-controller version" {
   run bash -c "kubectl get deployment efs-csi-controller -n kube-system -o json | grep $EFS_CSI_DRIVER_VERSION"
   [[ "${output}" =~ "aws-efs-csi-driver" ]]
 }
@@ -75,7 +78,6 @@
   [[ "${output}" =~ "Immediate" ]]
 }
 
-
 @test "evaluate standard namespaces" {
   run bash -c "kubectl get ns"
   [[ "${output}" =~ "lab-system" ]]
@@ -86,6 +88,12 @@
   [[ "${output}" =~ "admin-clusterrole" ]]
 }
 
-kubectl get pods | grep agent
-kubectl get pods | grep 'cluster-agent
+@test "validate datadog-agent status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'datadog-agent'"
+  [[ "${output}" =~ "Running" ]]
+}
 
+@test "validate datadog-cluster-agent status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'datadog-cluster-agent'"
+  [[ "${output}" =~ "Running" ]]
+}
