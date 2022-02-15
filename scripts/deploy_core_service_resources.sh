@@ -40,24 +40,4 @@ parameters:
   basePath: "/${CLUSTER}_dynamic"
 EOF
 
-cat <<EOF > test/efs-csi/test-efs-storage-class.yaml
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: test-efs-csi
-
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: efs-csi-test-storage-class
-provisioner: efs.csi.aws.com
-parameters:
-  provisioningMode: efs-ap
-  fileSystemId: $EFS_FILESYSTEM_ID
-  directoryPerms: "700"
-  basePath: "/dynamic"
-EOF
-
 kubectl apply -f core-services-resources --recursive

@@ -128,6 +128,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - kube/packages:
+          terraform-version: << pipeline.parameters.terraform-version >>
       - set-environment:
           cluster: << parameters.cluster >>
       - set-kubeconfig:
