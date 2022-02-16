@@ -4,7 +4,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: test-efs-claim
-  namespace: test-efs-csi
+  namespace: lab-system
 spec:
   accessModes:
     - ReadWriteMany
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: claim-test-pod-1
-  namespace: test-efs-csi
+  namespace: lab-system
 spec:
   containers:
   - name: app1
@@ -38,7 +38,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: claim-test-pod-2
-  namespace: test-efs-csi
+  namespace: lab-system
 spec:
   containers:
   - name: app2

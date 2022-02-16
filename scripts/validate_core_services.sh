@@ -32,12 +32,6 @@ export EFS_FILESYSTEM_ID=$(terraform output eks_efs_csi_storage_id)
 
 cat <<EOF > test/efs-csi/test-efs-storage-class.yaml
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: test-efs-csi
-
----
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
@@ -47,7 +41,7 @@ parameters:
   provisioningMode: efs-ap
   fileSystemId: $EFS_FILESYSTEM_ID
   directoryPerms: "700"
-  basePath: "/dynamic"
+  basePath: "/${CLUSTER}_test"
 EOF
 
 echo "debug:"
@@ -61,6 +55,5 @@ sleep 25
 bats test/efs-csi/dynamic-multipod-tls
 
 kubectl delete -f test/efs-csi/dynamic-multipod-tls/dynamic-claim-test.yaml
-sleep 10
+sleep 30
 kubectl delete -f test/efs-csi/test-efs-storage-class.yaml
-sleep 10
