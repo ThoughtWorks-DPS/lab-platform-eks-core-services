@@ -112,4 +112,4 @@ else
   sed -i "s/TABLE_COLOR/$TABLE_COLOR/g" observe/dashboard.json
 fi
 
-# python scripts/dashboard.py
+python scripts/dashboard.py
