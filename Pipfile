@@ -9,6 +9,7 @@ requests = "==2.27.0"
 datadog = "*"
 
 [dev-packages]
+pre-commit = "*"
 
 [requires]
 python_version = "3.10"

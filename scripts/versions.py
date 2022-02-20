@@ -92,6 +92,8 @@ def efs_csi_driver_current_version():
 current_efs_csi_driver_version = efs_csi_driver_current_version()
 latest_efs_csi_driver_version = efs_csi_driver_release_version()
 
+latest
+
 # log version updates available pending sercrethub (1password) expansion (don't have room for more secrets, such as Slack messaging)
 if current_metrics_server_version != latest_metrics_server_version:
     print(f"New metrics-server version available: {latest_metrics_server_version}")

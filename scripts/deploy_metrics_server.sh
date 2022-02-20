@@ -2,7 +2,8 @@
 set -e
 
 export CLUSTER=$1
-export METRICS_SERVER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .metrics_server_version)
+# export METRICS_SERVER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .metrics_server_version)
+export METRICS_SERVER_VERSION=0.6.1
 
 cat <<EOF > metrics-server/service-account.yaml
 ---

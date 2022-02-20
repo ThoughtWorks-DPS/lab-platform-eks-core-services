@@ -141,25 +141,45 @@ jobs:
       #     name: conformance tests
       #     command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> quick
 
-  version-check:
+  update-monitors:
+    parameters:
+      cluster:
+        description: cluster monitors to update
+        type: string
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << pipeline.parameters.shell-options >>
-    parameters:
-      cluster:
-        description: cluster to configure
-        type: string
     steps:
       - checkout
       - setup_remote_docker
-      - set-kubeconfig:
+      - set-environment:
           cluster: << parameters.cluster >>
       - run:
-          name: install python script requirements
+          name: install requirements
           command: pip install -r requirements.txt
       - run:
-          name: smoketest core services
-          command: python scripts/versions.py
+          name: update datadog cluster monitors
+          command: python scripts/deploy_monitors.py << parameters.cluster >>
+
+  # version-check:
+  #   docker:
+  #     - image: << pipeline.parameters.executor-image >>
+  #   shell: << pipeline.parameters.shell-options >>
+  #   parameters:
+  #     cluster:
+  #       description: cluster to configure
+  #       type: string
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - set-kubeconfig:
+  #         cluster: << parameters.cluster >>
+  #     - run:
+  #         name: install python script requirements
+  #         command: pip install -r requirements.txt
+  #     - run:
+  #         name: smoketest core services
+  #         command: python scripts/versions.py
 
   refresh-nodes:
     docker:
@@ -179,6 +199,24 @@ jobs:
       - run:
           name: cordon, drain, and delete 1/4 of the node group nodes
           command: bash scripts/refresh_nodes.sh << parameters.cluster >>
+
+
+  # update multi-cluster dashboard
+  update-dashboard:
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: sandbox
+      - run:
+          name: install requirements
+          command: pip install -r requirements.txt
+      - run:
+          name: update datadog cluster monitors
+          command: bash scripts/deploy_dashboard.sh
 
 workflows:
   version: 2
@@ -212,6 +250,14 @@ workflows:
           cluster: sandbox
           requires:
             - deploy-sandbox-core-services
+          filters: *on-push-main
+
+      - update-monitors:
+          name: update-sandbox-monitors
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+          requires:
+            - validate-sandbox-core-services
           filters: *on-push-main
 
       # release to preview cluster
@@ -250,6 +296,35 @@ workflows:
           shell: << pipeline.parameters.shell-options >>
           filters: *on-tag-main
 
+  lab-platform-eks-core-services-monitors:
+    jobs:
+      - update-monitors:
+          name: update-sandbox-monitors
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+          filters: *on-push-main
+
+      - approve-preview-monitors:
+          type: approval
+          requires:
+            - update-sandbox-monitors
+          filters: *on-push-main
+
+      - update-monitors:
+          name: update-preview-monitors
+          context: << pipeline.parameters.context >>
+          cluster: preview
+          requires:
+            - approve-preview-monitors
+          filters: *on-push-main
+
+  lab-platform-eks-core-services-dashboard:
+    jobs:
+      - update-dashboard:
+          name: update-datadog-dashboard
+          context: << pipeline.parameters.context >>
+          filters: *on-push-main
+
   nightly-validation:
     triggers:
       - schedule:
@@ -263,15 +338,18 @@ workflows:
           name: refresh-sandbox-nodes
           context: << pipeline.parameters.context >>
           cluster: sandbox
-      # - refresh-nodes:
-      #     name: refresh-preview-nodes
-      #     context: << pipeline.parameters.context >>
-      #     cluster: preview
+      - refresh-nodes:
+          name: refresh-preview-nodes
+          context: << pipeline.parameters.context >>
+          cluster: preview
       - validate-core-services:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
-      # - validate-core-services:
-      #     name: validate-preview-cluster
-      #     context: << pipeline.parameters.context >>
-      #     cluster: preview
+      - validate-core-services:
+          name: validate-preview-cluster
+          context: << pipeline.parameters.context >>
+          cluster: preview
+      - update-dashboard:
+          name: update-datadog-dashboard
+          context: << pipeline.parameters.context >>

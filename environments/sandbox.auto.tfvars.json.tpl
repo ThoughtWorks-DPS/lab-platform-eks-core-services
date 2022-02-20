@@ -5,7 +5,7 @@
 
     "cluster_name": "sandbox",
     "cluster_autoscaler_version": "1.21.2",
-    "metrics_server_version": "0.6.0",
+    "metrics_server_version": "0.6.1",
     "kube_state_metrics_version": "2.3.0",
     "aws_efs_csi_driver_version": "1.3.6",
     "aws_efs_csi_provisionser_version": "2.1.1",
