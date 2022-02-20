@@ -43,19 +43,22 @@ do
   # append environment metrics-server version
   export DESIRED_METRICS_SERVER_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .metrics_server_version)
   export METRICS_SERVER_VERSIONS="$METRICS_SERVER_VERSIONS $DESIRED_METRICS_SERVER_VERSION |"
+  echo $DESIRED_METRICS_SERVER_VERSION
 
   # append environment kube-state-metrics version
   export DESIRED_KUBE_STATE_METRICS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .kube_state_metrics_version)
   export KUBE_STATE_METRICS_VERSIONS="$KUBE_STATE_METRICS_VERSIONS $DESIRED_KUBE_STATE_METRICS_VERSION |"
+  echo $DESIRED_KUBE_STATE_METRICS_VERSION
 
   # append environment cluster-autoscaler version
   export DESIRED_CLUSTER_AUTOSCALER_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .cluster_autoscaler_version)
   export CLUSTER_AUTOSCALER_VERSIONS="$CLUSTER_AUTOSCALER_VERSIONS $DESIRED_CLUSTER_AUTOSCALER_VERSION |"
+  echo $DESIRED_CLUSTER_AUTOSCALER_VERSION
 
   # append environment efs-csi-driver version
   export DESIRED_EFS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .aws_efs_csi_driver_version)
   export EFS_CSI_VERSIONS="$EFS_CSI_VERSIONS $DESIRED_EFS_CSI_VERSION |"
-
+  echo $DESIRED_EFS_CSI_VERSION
 done
 
 # assemble markdown table
