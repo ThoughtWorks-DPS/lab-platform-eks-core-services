@@ -115,7 +115,7 @@ jobs:
           command: bash scripts/deploy_core_service_resources.sh << parameters.cluster >>
       - run:
           name: post deployment event to datadog
-          command: dog event post --tags "cluster:sandbox, deployment:lab-platform-eks-core-services" Deploy 'lab-platform-eks-core-services'
+          command: dog event post --tags "cluster:<< parameters.cluster >>, deployment:lab-platform-eks-core-services" Deploy 'lab-platform-eks-core-services'
 
   validate-core-services:
     docker:
@@ -160,26 +160,6 @@ jobs:
       - run:
           name: update datadog cluster monitors
           command: python scripts/deploy_monitors.py << parameters.cluster >>
-
-  # version-check:
-  #   docker:
-  #     - image: << pipeline.parameters.executor-image >>
-  #   shell: << pipeline.parameters.shell-options >>
-  #   parameters:
-  #     cluster:
-  #       description: cluster to configure
-  #       type: string
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker
-  #     - set-kubeconfig:
-  #         cluster: << parameters.cluster >>
-  #     - run:
-  #         name: install python script requirements
-  #         command: pip install -r requirements.txt
-  #     - run:
-  #         name: smoketest core services
-  #         command: python scripts/versions.py
 
   refresh-nodes:
     docker:
@@ -334,14 +314,7 @@ workflows:
               only:
                 - main
     jobs:
-      - refresh-nodes:
-          name: refresh-sandbox-nodes
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
-      - refresh-nodes:
-          name: refresh-preview-nodes
-          context: << pipeline.parameters.context >>
-          cluster: preview
+
       - validate-core-services:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
@@ -353,3 +326,22 @@ workflows:
       - update-dashboard:
           name: update-datadog-dashboard
           context: << pipeline.parameters.context >>
+
+  nightly-node-refresh:
+    triggers:
+      - schedule:
+          cron: "0 2 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+
+      - refresh-nodes:
+          name: refresh-sandbox-nodes
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+      - refresh-nodes:
+          name: refresh-preview-nodes
+          context: << pipeline.parameters.context >>
+          cluster: preview

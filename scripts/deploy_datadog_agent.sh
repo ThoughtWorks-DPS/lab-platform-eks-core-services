@@ -301,7 +301,36 @@ datadog:
   ## Each key becomes a file in /conf.d
   ## ref: https://github.com/DataDog/datadog-agent/tree/main/Dockerfiles/agent#optional-volumes
   ## ref: https://docs.datadoghq.com/agent/autodiscovery/
-  confd: {}
+  confd:
+    istio.yaml: |-
+      init_config:
+        service: <SERVICE>
+
+      instances:
+        - use_openmetrics: true
+          istiod_endpoint: http://istiod.istio-system:15014/metrics
+          # istio_mesh_endpoint: http://istio-proxy.istio-system:15090/stats/prometheus
+          # openmetrics_endpoint: localhost:15090/stats/prometheus
+          exclude_labels:
+            - source_version
+            - destination_version
+            - source_canonical_revision
+            - destination_canonical_revision
+            - source_principal
+            - destination_principal
+            - source_cluster
+            - destination_cluster
+            - source_canonical_service
+            - destination_canonical_service
+            - source_workload_namespace
+            - destination_workload_namespace
+            - request_protocol
+            - connection_security_policy
+
+      logs:
+        "source": "istio"
+        "service": "<SERVICE_NAME>"
+
   #   redisdb.yaml: |-
   #     init_config:
   #     instances:
@@ -324,23 +353,23 @@ datadog:
   dockerSocketPath:  # /var/run/docker.sock
 
   # datadog.criSocketPath -- Path to the container runtime socket (if different from Docker) # /var/run/containerd/containerd.sock
-  criSocketPath:  /run/dockershim.sock  #bottlerock support
+  criSocketPath:  # /run/dockershim.sock bottlerock support
 
   ## Enable process agent and provide custom configs
   processAgent:
     # datadog.processAgent.enabled -- Set this to true to enable live process monitoring agent
     ## Note: /etc/passwd is automatically mounted to allow username resolution.
     ## ref: https://docs.datadoghq.com/graphing/infrastructure/process/#kubernetes-daemonset
-    enabled: false
+    enabled: true
 
     # datadog.processAgent.processCollection -- Set this to true to enable process collection in process monitoring agent
     ## Requires processAgent.enabled to be set to true to have any effect
-    processCollection: false
+    processCollection: true
 
     # datadog.processAgent.stripProcessArguments -- Set this to scrub all arguments from collected processes
     ## Requires processAgent.enabled and processAgent.processCollection to be set to true to have any effect
     ## ref: https://docs.datadoghq.com/infrastructure/process/?tab=linuxwindows#process-arguments-scrubbing
-    stripProcessArguments: false
+    stripProcessArguments: true
 
     # datadog.processAgent.processDiscovery -- Enables or disables autodiscovery of integrations
     processDiscovery: false
@@ -381,7 +410,7 @@ datadog:
     runtimeCompilationAssetDir: /var/tmp/datadog-agent/system-probe
 
     # datadog.systemProbe.collectDNSStats -- Enable DNS stat collection
-    collectDNSStats: true
+    collectDNSStats: false
 
     # datadog.systemProbe.maxTrackedConnections -- the maximum number of tracked connections
     maxTrackedConnections: 131072
@@ -396,14 +425,14 @@ datadog:
     # datadog.orchestratorExplorer.enabled -- Set this to false to disable the orchestrator explorer
     ## This requires processAgent.enabled and clusterAgent.enabled to be set to true
     ## ref: TODO - add doc link
-    enabled: false
+    enabled: true
 
     # datadog.orchestratorExplorer.container_scrubbing -- Enable the scrubbing of containers in the kubernetes resource YAML for sensitive information
     ## The container scrubbing is taking significant resources during data collection.
     ## If you notice that the cluster-agent uses too much CPU in larger clusters
     ## turning this option off will improve the situation.
     container_scrubbing:
-      enabled: false
+      enabled: true
 
   networkMonitoring:
     # datadog.networkMonitoring.enabled -- Enable network performance monitoring
@@ -576,7 +605,7 @@ clusterAgent:
     wpaController: false
 
 
-    useDatadogMetrics: false
+    useDatadogMetrics: true
     createReaderRbac: true
 
     # clusterAgent.metricsProvider.aggregator -- Define the aggregator the cluster agent will use to process the metrics. The options are (avg, min, max, sum)
@@ -612,10 +641,10 @@ clusterAgent:
 
   admissionController:
     # clusterAgent.admissionController.enabled -- Enable the admissionController to be able to inject APM/Dogstatsd config and standard tags (env, service, version) automatically into your pods
-    enabled: true
+    enabled: false
 
     # clusterAgent.admissionController.mutateUnlabelled -- Enable injecting config without having the pod label 'admission.datadoghq.com/enabled="true"'
-    mutateUnlabelled: true
+    mutateUnlabelled: false
 
 
 
@@ -703,8 +732,8 @@ clusterAgent:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      maxSurge: 2
+      maxUnavailable: 1
 
   # clusterAgent.deploymentAnnotations -- Annotations to add to the cluster-agents's deployment
   deploymentAnnotations: {}
@@ -875,7 +904,7 @@ agents:
     apparmor:
       # agents.podSecurity.apparmor.enabled -- If true, enable apparmor enforcement
       ## see: https://kubernetes.io/docs/tutorials/clusters/apparmor/
-      enabled: true
+      enabled: false
 
     # agents.podSecurity.apparmorProfiles -- Allowed apparmor profiles
     apparmorProfiles:
@@ -1126,7 +1155,7 @@ agents:
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: "10%"
+      maxUnavailable: 1
 
   # agents.priorityClassCreate -- Creates a priorityClass for the Datadog Agent's Daemonset pods.
   priorityClassCreate: false
@@ -1183,7 +1212,7 @@ agents:
 
 clusterChecksRunner:
 
-  enabled: false
+  enabled: true
 
   ## Define the Datadog image to work with.
   image:
@@ -1210,7 +1239,7 @@ clusterChecksRunner:
     #   - name: "<REG_SECRET>"
 
   # clusterChecksRunner.createPodDisruptionBudget -- Create the pod disruption budget to apply to the cluster checks agents
-  createPodDisruptionBudget: false
+  createPodDisruptionBudget: true
 
   # Provide Cluster Checks Deployment pods RBAC configuration
   rbac:
@@ -1248,8 +1277,8 @@ clusterChecksRunner:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      maxSurge: 2
+      maxUnavailable: 1
 
   # clusterChecksRunner.dnsConfig -- specify dns configuration options for datadog cluster agent containers e.g ndots
   ## ref: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config
@@ -1421,4 +1450,10 @@ helm upgrade --install datadog-agent datadog/datadog \
   --set datadog.apiKey=$DATADOG_API_KEY \
   --set datadog.appKey=$DATADOG_APP_KEY \
   --set datadog.clusterName=$CLUSTER \
+  --set datadog.logLevel=INFO \
+  --set datadog.tags=["cluster:$CLUSTER"] \
+  --set dogstatsd.tags=["cluster:$CLUSTER"] \
+  --set clusteragent.image.tag=$DATADOG_CLUSTER_AGENT_VERSION \
+  --set clusteragent.env=["DD_CLUSTER_CHECKS_ENABLED:true","DD_CLUSTER_NAME:$CLUSTER"] \
+  --set agent.image.tag=$DATADOG_AGENT_VERSION
   --set targetSystem=linux
