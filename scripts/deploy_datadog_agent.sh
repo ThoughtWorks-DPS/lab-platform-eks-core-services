@@ -1454,6 +1454,5 @@ helm upgrade --install datadog-agent datadog/datadog \
   --set datadog.tags=["cluster:$CLUSTER"] \
   --set dogstatsd.tags=["cluster:$CLUSTER"] \
   --set clusteragent.image.tag=$DATADOG_CLUSTER_AGENT_VERSION \
-  --set clusteragent.env=["DD_CLUSTER_CHECKS_ENABLED:true","DD_CLUSTER_NAME:$CLUSTER"] \
-  --set agent.image.tag=$DATADOG_AGENT_VERSION
+  --set agent.image.tag=$DATADOG_AGENT_VERSION \
   --set targetSystem=linux
