@@ -4,7 +4,7 @@ import sys
 import requests
 
 def set_cluster():
-    clusters = ["sandbox", "preview"]
+    clusters = ["sandbox-us-east-2", "prod-us-east-1"]
     cluster = sys.argv[1]
 
     if cluster not in clusters:

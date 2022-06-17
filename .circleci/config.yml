@@ -219,7 +219,7 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: update lab-platform-eks-core-services dashboard
-          command: bash scripts/deploy_dashboard.sh
+          command: bash scripts/deploy_dashboard.sh sandbox-us-east-2
 
 workflows:
   version: 2
@@ -230,7 +230,7 @@ workflows:
           name: create sandbox-us-east-2 core service irsa roles
           context: << pipeline.parameters.context >>
           shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          workspace: sandbox
+          workspace: sandbox-us-east-2
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:

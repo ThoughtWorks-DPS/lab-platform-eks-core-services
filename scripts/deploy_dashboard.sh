@@ -11,10 +11,10 @@ function version_alert() {
     curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $SLACK_LAB_EVENTS
   fi
 }
-
-export AWS_DEFAULT_REGION=$(cat sandbox.auto.tfvars.json | jq -r .aws_region)
-export AWS_ASSUME_ROLE=$(cat sandbox.auto.tfvars.json | jq -r .aws_assume_role)
-export AWS_ACCOUNT_ID=$(cat sandbox.auto.tfvars.json | jq -r .aws_account_id)
+CLUSTER=$1
+export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_role)
+export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
 
 echo "debug:"
 echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
