@@ -66,7 +66,7 @@ commands:
         type: string
     steps:
       - run:
-          name: setup kubeconfig and deploy core services
+          name: setup kubeconfig
           command: |
             mkdir -p ~/.kube
             ENV=<< parameters.cluster >> op inject -i tpl/kubeconfig.tpl -o ~/.kube/config
