@@ -13,6 +13,10 @@ export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 export DESIRED_METRICS_SERVER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .metrics_server_version)
 
+echo "debug:"
+echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
+echo "AWS_ASSUME_ROLE: $AWS_ASSUME_ROLE"
 
 echo "validate core services"
 bats test
