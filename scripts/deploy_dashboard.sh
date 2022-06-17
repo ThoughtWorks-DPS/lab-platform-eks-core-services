@@ -8,7 +8,7 @@ function version_alert() {
   export TABLE_COLOR=$ALERT_TABLE_COLOR
   # every 7 days, also send a slack message
   if (( "$(date +%d)" % 7 )); then
-    curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $SLACK_LAB_EVENTS
+    curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $LAB_EVENTS_CHANNEL_WEBHOOK
   fi
 }
 CLUSTER=$1

@@ -16,8 +16,8 @@ cluster = set_cluster()
 
 base_url = "https://api.datadoghq.com/api/v1/{resource}"
 headers = {
-    "DD-API-KEY": os.getenv("DD_API_KEY"),
-    "DD-APPLICATION-KEY": os.getenv("DD_APP_KEY")
+    "DD-API-KEY": os.getenv("DATADOG_API_KEY"),
+    "DD-APPLICATION-KEY": os.getenv("DATADOG_APP_KEY")
 }
 
 monitor_url = base_url.format(resource="monitor")

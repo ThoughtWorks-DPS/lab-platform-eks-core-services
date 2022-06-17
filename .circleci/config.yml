@@ -69,7 +69,7 @@ commands:
           name: setup kubeconfig and deploy core services
           command: |
             mkdir -p ~/.kube
-            SECRETHUB_VAR_ENV=<< parameters.cluster >> op inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+            ENV=<< parameters.cluster >> op inject -i tpl/kubeconfig.tpl -o ~/.kube/config
 
 jobs:
 
