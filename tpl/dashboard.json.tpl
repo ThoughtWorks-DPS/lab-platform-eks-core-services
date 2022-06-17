@@ -378,7 +378,7 @@
   "template_variables": [
     {
       "name": "cluster",
-      "default": "sandbox",
+      "default": "sandbox-us-east-2",
       "prefix": "cluster",
       "available_values": []
     },

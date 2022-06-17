@@ -1,4 +1,4 @@
-sandbox.auto.tfvars.json
+*.auto.tfvars.json
 kubeconfig*
 .terraform
 .terraform.*

@@ -26,18 +26,18 @@ parameters:
 
 EOF
 
-cat <<EOF > core-services-resources/efs-storage-class.yaml
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: $CLUSTER-efs-storage-class
-provisioner: efs.csi.aws.com
-parameters:
-  provisioningMode: efs-ap
-  fileSystemId: $EFS_FILESYSTEM_ID
-  directoryPerms: "700"
-  basePath: "/${CLUSTER}_dynamic"
-EOF
+# cat <<EOF > core-services-resources/efs-storage-class.yaml
+# ---
+# kind: StorageClass
+# apiVersion: storage.k8s.io/v1
+# metadata:
+#   name: $CLUSTER-efs-storage-class
+# provisioner: efs.csi.aws.com
+# parameters:
+#   provisioningMode: efs-ap
+#   fileSystemId: $EFS_FILESYSTEM_ID
+#   directoryPerms: "700"
+#   basePath: "/${CLUSTER}_dynamic"
+# EOF
 
 kubectl apply -f core-services-resources --recursive

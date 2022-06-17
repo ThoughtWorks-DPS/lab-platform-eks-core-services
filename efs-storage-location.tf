@@ -1,17 +1,17 @@
 module "efs_csi_storage" {
   source = "cloudposse/efs/aws"
-  version     = "0.32.5"
+  version     = "0.32.7"
 
   name      = "${var.cluster_name}-efs-csi-storage"
 
   region    = var.aws_region
   vpc_id    = data.aws_vpc.cluster_vpc.id
-  subnets   = data.aws_subnet_ids.private.ids
+  subnets   = data.aws_subnets.private.ids
 
   allowed_cidr_blocks = [for s in data.aws_subnet.private_ids : s.cidr_block]
   associated_security_group_ids = concat(
-    data.aws_security_groups.cluster_worker_security_group_id.ids,
-    data.aws_security_groups.cluster_security_group_id.ids
+    data.aws_security_groups.cluster_security_group_id.ids,
+    data.aws_security_groups.cluster_worker_security_group_id.ids
   )
 
   efs_backup_policy_enabled = true
@@ -19,7 +19,7 @@ module "efs_csi_storage" {
 
   tags = {
     "cluster" = var.cluster_name
-    "pipeline" = "lighthouse-di-platform-eks-base"
+    "pipeline" = "lab-platform-eks-core-services"
   }
 }
 

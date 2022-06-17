@@ -2,8 +2,7 @@
 set -e
 
 export CLUSTER=$1
-# export METRICS_SERVER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .metrics_server_version)
-export METRICS_SERVER_VERSION=0.6.1
+export METRICS_SERVER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .metrics_server_version)
 
 cat <<EOF > metrics-server/service-account.yaml
 ---
@@ -161,7 +160,7 @@ spec:
         - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
         - --kubelet-use-node-status-port
         - --metric-resolution=15s
-        image: k8s.gcr.io/metrics-server/metrics-server:v${METRICS_SERVER_VERSION}
+        image: k8s.gcr.io/metrics-server/metrics-server:${METRICS_SERVER_VERSION}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3

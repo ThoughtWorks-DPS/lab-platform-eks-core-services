@@ -4,9 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-kubernetes = "==21.7.0"
-requests = "==2.27.0"
-datadog = "*"
+kubernetes = "==23.6.0"
+requests = "==2.28.0"
 
 [dev-packages]
 pre-commit = "*"

@@ -492,9 +492,9 @@ datadog:
   ## ref: https://docs.datadoghq.com/agent/kubernetes/prometheus/
   prometheusScrape:
     # datadog.prometheusScrape.enabled -- Enable autodiscovering pods and services exposing prometheus metrics.
-    enabled: false
+    enabled: true
     # datadog.prometheusScrape.serviceEndpoints -- Enable generating dedicated checks for service endpoints.
-    serviceEndpoints: false
+    serviceEndpoints: true
     # datadog.prometheusScrape.additionalConfigs -- Allows adding advanced openmetrics check configurations with custom discovery rules. (Requires Agent version 7.27+)
     additionalConfigs: []
       # -
@@ -627,8 +627,6 @@ clusterAgent:
   env:
     - name: DD_CLUSTER_CHECKS_ENABLED
       value: "true"
-    - name: DD_CLUSTER_NAME
-      value: $CLUSTER
 
   # clusterAgent.envFrom --  Set environment variables specific to Cluster Agent from configMaps and/or secrets
   ## The Cluster-Agent supports many additional environment variables
@@ -1220,7 +1218,7 @@ clusterChecksRunner:
     name: agent
 
     # clusterChecksRunner.image.tag -- Define the Agent version to use
-    tag: 7.33.0
+    tag: 7.36.0
 
     # clusterChecksRunner.image.tagSuffix -- Suffix to append to Agent tag
     ## Ex:
@@ -1453,7 +1451,7 @@ helm upgrade --install datadog-agent datadog/datadog \
   --set datadog.logLevel=INFO \
   --set datadog.tags=["cluster:$CLUSTER"] \
   --set dogstatsd.tags=["cluster:$CLUSTER"] \
-  --set clusteragent.image.tag=$DATADOG_CLUSTER_AGENT_VERSION \
-  --set clusteragent.env=["DD_CLUSTER_CHECKS_ENABLED:true","DD_CLUSTER_NAME:$CLUSTER"] \
-  --set agent.image.tag=$DATADOG_AGENT_VERSION
+  --set clusterAgent.image.tag=$DATADOG_CLUSTER_AGENT_VERSION \
+  --set agent.image.tag=$DATADOG_AGENT_VERSION \
+  --set clusterChecksRunner.image.tag=$DATADOG_AGENT_VERSION \
   --set targetSystem=linux

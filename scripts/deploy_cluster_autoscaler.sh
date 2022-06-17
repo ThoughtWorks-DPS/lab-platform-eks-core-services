@@ -3,7 +3,7 @@ set -e
 
 export CLUSTER=$1
 export CLUSTER_AUTOSCALER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .cluster_autoscaler_version)
-export ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
+export ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_account_id)
 
 cat <<EOF > cluster-autoscaler/service-account.yaml
 ---
@@ -15,9 +15,8 @@ metadata:
     k8s-app: cluster-autoscaler
   name: cluster-autoscaler
   namespace: kube-system
-  annotations: 
+  annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/$CLUSTER-cluster-autoscaler
-# automountServiceAccountToken: true
 EOF
 
 cat <<EOF > cluster-autoscaler/cluster-role.yaml
@@ -159,7 +158,6 @@ spec:
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8085'
-        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
     spec:
       priorityClassName: system-cluster-critical
       securityContext:
@@ -168,7 +166,7 @@ spec:
         fsGroup: 65534
       serviceAccountName: cluster-autoscaler
       containers:
-        - image: k8s.gcr.io/autoscaling/cluster-autoscaler:v${CLUSTER_AUTOSCALER_VERSION}
+        - image: k8s.gcr.io/autoscaling/cluster-autoscaler:${CLUSTER_AUTOSCALER_VERSION}
           name: cluster-autoscaler
           resources:
             limits:
