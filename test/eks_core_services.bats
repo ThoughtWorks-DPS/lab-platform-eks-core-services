@@ -20,15 +20,10 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-@test "validate efs-csi-controller status" {
-  run bash -c "kubectl get po -n kube-system -o wide | grep 'efs-csi-controller'"
-  [[ "${output}" =~ "Running" ]]
-}
-
-@test "evaluate ebs storageclass" {
-  run bash -c "kubectl get storageclasses | grep "${CLUSTER}-ebs""
-  [[ "${output}" =~ "WaitForFirstConsumer" ]]
-}
+# @test "validate efs-csi-controller status" {
+#   run bash -c "kubectl get po -n kube-system -o wide | grep 'efs-csi-controller'"
+#   [[ "${output}" =~ "Running" ]]
+# }
 
 # @test "evaluate efs storageclass" {
 #   run bash -c "kubectl get storageclasses | grep "${CLUSTER}-efs""
