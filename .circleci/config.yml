@@ -189,7 +189,7 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: update datadog cluster monitors
-          command: python scripts/deploy_monitors.py << parameters.cluster >>
+          command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .default_node_group_desired_size) $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
 
 
   # update multi-cluster dashboard
