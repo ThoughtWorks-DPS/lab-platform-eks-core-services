@@ -9,6 +9,7 @@
     "metrics_server_version": "v0.6.1",
     "kube_state_metrics_chart_version": "4.9.0",
     "aws_efs_csi_driver_chart_version": "2.2.6",
+    "alert_channel": "prod",
 
     "datadog_api_key": "{{ op://empc-lab/svc-datadog/api-key }}",
     "datadog_app_key": "{{ op://empc-lab/svc-datadog/app-key }}",

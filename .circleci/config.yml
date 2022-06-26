@@ -127,9 +127,6 @@ jobs:
       - run:
           name: deploy core-services-resources
           command: bash scripts/deploy_core_service_resources.sh << parameters.cluster >>
-      # - run:
-      #     name: post deployment event to datadog
-      #     command: dog event post --tags "cluster:<< parameters.cluster >>, deployment:lab-platform-eks-core-services" Deploy 'lab-platform-eks-core-services'
 
   validate-core-services:
     docker:

@@ -175,7 +175,7 @@
         ],
         "events": [
           {
-            "q": "tags:cluster:$cluster, deployment:lab*"
+            "q": "tags:cluster:$cluster, event:deployment"
           }
         ]
       },

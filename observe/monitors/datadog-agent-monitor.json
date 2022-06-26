@@ -1,8 +1,8 @@
 {
 	"name": "lab-{{ cluster }} datadog-agent alert",
 	"type": "query alert",
-	"query": "max(last_10m):sum:datadog.agent.running{cluster:{{ cluster }}} < 3",
-	"message": "@slack-DPS-lab-{{ cluster }}-alerts",
+	"query": "max(last_10m):sum:datadog.agent.running{cluster:{{ cluster }}} < {{ num_nodes }}",
+	"message": "@slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",
 		"pipeline:lab-platform-eks-core-services"

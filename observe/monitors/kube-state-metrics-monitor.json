@@ -2,7 +2,7 @@
 	"name": "lab-{{ cluster }} kube-state-metrics alert",
 	"type": "query alert",
 	"query": "max(last_10m):sum:kubernetes_state.container.ready{cluster:{{ cluster }},container:kube-state-metrics} < 1",
-	"message": "@slack-DPS-lab-{{ cluster }}-alerts",
+	"message": "@slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",
 		"pipeline:lab-platform-eks-core-services"
