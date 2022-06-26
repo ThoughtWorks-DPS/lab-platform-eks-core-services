@@ -49,3 +49,7 @@ The `admin-clusterrole` is created with the default system:admin permissions and
 **sonobuoy conformance test** has been commented out in the pipeline. We've previously demonstrated this as part of core services however, argueably the better time to introduce is when you begin to deploy your own custom resource definitions.  
 
 - the datadog monitor and dashboard update scripts are basic and there is obviously refactoring potential to turn that into a standard piece of code with functionality accessed via an orb or something similar
+
+### TODO
+
+- currently the datadog agent monitor checks that there are at 3 healthy daemonsets available. 3 is the current desired min size as managed by the lab-platform-eks-base pipeline. This is a static (or hardcoded) value threshhold. Technically there should be a dynamic check that figures out how many nodes happen to be running (given cluster-autoscaler) and check against that. Alternatively could just check that no datadog agents are pending or failed, etc.
