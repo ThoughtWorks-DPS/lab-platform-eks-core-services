@@ -50,7 +50,7 @@
 
       "definition": {
         "type": "note",
-        "content": "| dependency | sandbox | preview |\n|----|----|----|\n| metrics-server | 0.6.0 | 0.6.0 |\n| kube-state-metrics | 2.3.0 | 2.3.0 |\n| cluster-autoscaler | 1.21.2 | 1.21.2 |\n| efc-csi | 1.3.6 | 1.3.6 |\n",
+        "content": "| dependency | sandbox-us-east-2 | prod-us-east-1 |\n|----|----|----|\n| metrics-server | v0.6.1 | v0.6.1 |\n| kube-state-metrics* | 4.9.0 | 4.9.0 |\n| efc-csi* | 2.2.6 | 2.2.6 |\n| datadog-agent | 7.36.0 | 7.36.0 |\n\n*helm chart version  \nReview datadog chart version on agent change  \ncluster-autoscaler version should match eks k8s version",
         "background_color": "yellow",
         "font_size": "14",
         "text_align": "left",
@@ -70,7 +70,7 @@
     {
       "definition": {
         "type": "note",
-        "content": "| available |\n|----|\nv0.6.1\n2.3.0\n1.22.2\n1.3.6\n",
+        "content": "| available |\n|----|\nv0.6.1\n4.9.2\n2.2.7\n7.37.0\n",
         "background_color": "pink",
         "font_size": "14",
         "text_align": "left",
@@ -378,7 +378,7 @@
   "template_variables": [
     {
       "name": "cluster",
-      "default": "sandbox",
+      "default": "sandbox-us-east-2",
       "prefix": "cluster",
       "available_values": []
     },

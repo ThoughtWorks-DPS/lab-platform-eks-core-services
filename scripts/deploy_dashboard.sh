@@ -8,68 +8,54 @@ function version_alert() {
   export TABLE_COLOR=$ALERT_TABLE_COLOR
   # every 7 days, also send a slack message
   if (( "$(date +%d)" % 7 )); then
-    curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $LAB_EVENTS_CHANNEL_WEBHOOK
+    export payload="{'text': '$1' }"
+    curl -X POST -H 'Content-type: application/json' --data "$payload" $LAB_EVENTS_CHANNEL_WEBHOOK
   fi
 }
-CLUSTER=$1
-export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
-export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_role)
-export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
-
-echo "debug:"
-echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
-echo "AWS_ASSUME_ROLE=$AWS_ASSUME_ROLE"
-echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID"
-# echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:0:5}"
-
-aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-eks-core-services > credentials
-
-export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
-export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
-export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 # current versions table
 export TABLE="| dependency | sandbox-us-east-2 | prod-us-east-1 |\\\\n|----|----|----|\\\\n"
 export METRICS_SERVER_VERSIONS="| metrics-server |"
-export KUBE_STATE_METRICS_VERSIONS="| kube-state-metrics |"
-export CLUSTER_AUTOSCALER_VERSIONS="| cluster-autoscaler |"
-export EFS_CSI_VERSIONS="| efc-csi |"
+export KUBE_STATE_METRICS_VERSIONS="| kube-state-metrics* |"
+export EFS_CSI_VERSIONS="| efc-csi* |"
+export DATADOG_VERSIONS="| datadog-agent |"
 
 declare -a clusters=(sandbox-us-east-2 prod-us-east-1)
 
 echo "generate markdown table with the desired versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 for cluster in "${clusters[@]}";
 do
+  echo $cluster
   # append environment metrics-server version
   export DESIRED_METRICS_SERVER_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .metrics_server_version)
   export METRICS_SERVER_VERSIONS="$METRICS_SERVER_VERSIONS $DESIRED_METRICS_SERVER_VERSION |"
   echo $DESIRED_METRICS_SERVER_VERSION
 
   # append environment kube-state-metrics version
-  export DESIRED_KUBE_STATE_METRICS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .kube_state_metrics_version)
+  export DESIRED_KUBE_STATE_METRICS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .kube_state_metrics_chart_version)
   export KUBE_STATE_METRICS_VERSIONS="$KUBE_STATE_METRICS_VERSIONS $DESIRED_KUBE_STATE_METRICS_VERSION |"
   echo $DESIRED_KUBE_STATE_METRICS_VERSION
 
-  # append environment cluster-autoscaler version
-  export DESIRED_CLUSTER_AUTOSCALER_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .cluster_autoscaler_version)
-  export CLUSTER_AUTOSCALER_VERSIONS="$CLUSTER_AUTOSCALER_VERSIONS $DESIRED_CLUSTER_AUTOSCALER_VERSION |"
-  echo $DESIRED_CLUSTER_AUTOSCALER_VERSION
-
   # append environment efs-csi-driver version
-  export DESIRED_EFS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .aws_efs_csi_driver_version)
+  export DESIRED_EFS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .aws_efs_csi_driver_chart_version)
   export EFS_CSI_VERSIONS="$EFS_CSI_VERSIONS $DESIRED_EFS_CSI_VERSION |"
   echo $DESIRED_EFS_CSI_VERSION
+
+  # append environment datadog-agent version
+  export DESIRED_DATADOG_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .datadog_agent_version)
+  export DATADOG_VERSIONS="$DATADOG_VERSIONS $DESIRED_DATADOG_VERSION |"
+  echo $DESIRED_DATADOG_VERSION
 done
 
 # assemble markdown table
-export CURRENT_TABLE="$TABLE$METRICS_SERVER_VERSIONS\\\\n$KUBE_STATE_METRICS_VERSIONS\\\\n$CLUSTER_AUTOSCALER_VERSIONS\\\\n$EFS_CSI_VERSIONS\\\\n"
+export CURRENT_TABLE="$TABLE$METRICS_SERVER_VERSIONS\\\\n$KUBE_STATE_METRICS_VERSIONS\\\\n$EFS_CSI_VERSIONS\\\\n$DATADOG_VERSIONS\\\\n\\\\n*helm chart version  \\\\nReview datadog chart version on agent change  \\\\ncluster-autoscaler version should match eks k8s version"
 
 # current versions table
 declare TABLE="| available |\\\\n|----|\\\\n"
 export METRICS_SERVER_VERSIONS="| metrics-server |"
 export KUBE_STATE_METRICS_VERSIONS="| kube-state-metrics |"
-export CLUSTER_AUTOSCALER_VERSIONS="| cluster-autoscaler |"
 export EFS_CSI_VERSIONS="| efc-csi |"
+export DATADOG_VERSIONS="| datadog-agaent |"
 
 echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 
@@ -78,11 +64,11 @@ python scripts/latest_versions.py
 
 export LATEST_METRICS_SERVER_VERSION=$(cat latest_versions.json | jq -r .metrics_server_version)
 export LATEST_KUBE_STATE_METRICS_VERSION=$(cat latest_versions.json | jq -r .kube_state_metrics_version)
-export LATEST_CLUSTER_AUTOSCALER_VERSION=$(cat latest_versions.json | jq -r .cluster_autoscaler_version)
 export LATEST_EFS_CSI_VERSION=$(cat latest_versions.json | jq -r .efs_csi_version)
+export LATEST_DATADOG_VERSION=$(cat latest_versions.json | jq -r .datadog_agent_version)
 
 # assemble markdown table
-export LATEST_TABLE="$TABLE$LATEST_METRICS_SERVER_VERSION\\\\n$LATEST_KUBE_STATE_METRICS_VERSION\\\\n$LATEST_CLUSTER_AUTOSCALER_VERSION\\\\n$LATEST_EFS_CSI_VERSION\\\\n"
+export LATEST_TABLE="$TABLE$LATEST_METRICS_SERVER_VERSION\\\\n$LATEST_KUBE_STATE_METRICS_VERSION\\\\n$LATEST_EFS_CSI_VERSION\\\\n$LATEST_DATADOG_VERSION\\\\n"
 
 echo "check desired production versions against latest"
 
@@ -92,11 +78,11 @@ fi
 if [[ $DESIRED_KUBE_STATE_METRICS_VERSION != $LATEST_KUBE_STATE_METRICS_VERSION ]]; then
   version_alert "New kube-state-metrics version available: $LATEST_KUBE_STATE_METRICS_VERSION"
 fi
-if [[ $DESIRED_CLUSTER_AUTOSCALER_VERSION != $LATEST_CLUSTER_AUTOSCALER_VERSION ]]; then
-  version_alert "New cluster-autoscaler version available: $LATEST_CLUSTER_AUTOSCALER_VERSION"
-fi
 if [[ $DESIRED_EFS_CSI_VERSION != $LATEST_EFS_CSI_VERSION ]]; then
   version_alert "New efs-csi-driver version available: $LATEST_EFS_CSI_VERSION"
+fi
+if [[ $DESIRED_DATADOG_VERSION != $LATEST_DATADOG_VERSION ]]; then
+  version_alert "New datadog-agaent version available: $LATEST_DATADOG_VERSION"
 fi
 
 echo "insert markdown into dashboard.json"

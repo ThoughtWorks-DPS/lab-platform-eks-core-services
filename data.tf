@@ -39,3 +39,7 @@ data "aws_security_groups" "cluster_worker_security_group_id" {
     Name = "${var.cluster_name}-eks_worker_sg"
   }
 }
+
+# output "cluster_version" {
+#   value = data.aws_eks_cluster.eks.version
+# }
