@@ -233,10 +233,6 @@ workflows:
             - set-environment:
                 cluster: sandbox-us-east-2
                 source-env: op.nonprod.env
-          after-terraform:
-            - run:
-                name: write eks kubernetes server version
-                command: terraform output cluster_version > cluster_version.txt
           filters: *on-push-main
 
       - deploy-core-services:
