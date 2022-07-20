@@ -14,5 +14,5 @@
     "datadog_api_key": "{{ op://empc-lab/svc-datadog/api-key }}",
     "datadog_app_key": "{{ op://empc-lab/svc-datadog/app-key }}",
     "datadog_cluster_agent_version": "1.20.0",
-    "datadog_agent_version": "7.37.0"
+    "datadog_agent_version": "7.37.1"
 }
