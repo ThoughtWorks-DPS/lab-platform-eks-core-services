@@ -72,9 +72,9 @@ export LATEST_TABLE="$TABLE$LATEST_METRICS_SERVER_VERSION\\\\n$LATEST_KUBE_STATE
 
 echo "check desired production versions against latest"
 
-# if [[ $DESIRED_METRICS_SERVER_VERSION != $LATEST_METRICS_SERVER_VERSION ]]; then
-#   version_alert "New metrics-server version available: $LATEST_METRICS_SERVER_VERSION"
-# fi
+if [[ $DESIRED_METRICS_SERVER_VERSION != $LATEST_METRICS_SERVER_VERSION ]]; then
+  version_alert "New metrics-server version available: $LATEST_METRICS_SERVER_VERSION"
+fi
 if [[ $DESIRED_KUBE_STATE_METRICS_VERSION != $LATEST_KUBE_STATE_METRICS_VERSION ]]; then
   version_alert "New kube-state-metrics version available: $LATEST_KUBE_STATE_METRICS_VERSION"
 fi
