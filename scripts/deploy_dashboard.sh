@@ -82,7 +82,7 @@ if [[ $DESIRED_EFS_CSI_VERSION != $LATEST_EFS_CSI_VERSION ]]; then
   version_alert "New efs-csi-driver version available: $LATEST_EFS_CSI_VERSION"
 fi
 if [[ $DESIRED_DATADOG_VERSION != $LATEST_DATADOG_VERSION ]]; then
-  version_alert "New datadog-agaent version available: $LATEST_DATADOG_VERSION"
+  version_alert "New datadog-agent version available: $LATEST_DATADOG_VERSION"
 fi
 
 echo "insert markdown into dashboard.json"
