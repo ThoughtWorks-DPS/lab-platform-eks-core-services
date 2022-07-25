@@ -75,9 +75,9 @@ echo "check desired production versions against latest"
 if [[ $DESIRED_METRICS_SERVER_VERSION != $LATEST_METRICS_SERVER_VERSION ]]; then
   version_alert "New metrics-server version available: $LATEST_METRICS_SERVER_VERSION"
 fi
-if [[ $DESIRED_KUBE_STATE_METRICS_VERSION != $LATEST_KUBE_STATE_METRICS_VERSION ]]; then
-  version_alert "New kube-state-metrics version available: $LATEST_KUBE_STATE_METRICS_VERSION"
-fi
+# if [[ $DESIRED_KUBE_STATE_METRICS_VERSION != $LATEST_KUBE_STATE_METRICS_VERSION ]]; then
+#   version_alert "New kube-state-metrics version available: $LATEST_KUBE_STATE_METRICS_VERSION"
+# fi
 if [[ $DESIRED_EFS_CSI_VERSION != $LATEST_EFS_CSI_VERSION ]]; then
   version_alert "New efs-csi-driver version available: $LATEST_EFS_CSI_VERSION"
 fi
