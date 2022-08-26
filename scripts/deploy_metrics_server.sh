@@ -49,6 +49,7 @@ rules:
   - ""
   resources:
   - nodes/metrics
+  - nodes/stats
   verbs:
   - get
 - apiGroups:
