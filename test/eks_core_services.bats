@@ -35,12 +35,12 @@
 #   [[ "${output}" =~ "admin-clusterrole" ]]
 # }
 
-@test "validate datadog-agent status" {
-  run bash -c "kubectl get po -n datadog -o wide | grep 'datadog-agent'"
-  [[ "${output}" =~ "Running" ]]
-}
+# @test "validate datadog-agent status" {
+#   run bash -c "kubectl get po -n datadog -o wide | grep 'datadog-agent'"
+#   [[ "${output}" =~ "Running" ]]
+# }
 
-@test "validate datadog-cluster-agent status" {
-  run bash -c "kubectl get po -n datadog -o wide | grep 'datadog-agent-cluster-agent'"
-  [[ "${output}" =~ "Running" ]]
-}
+# @test "validate datadog-cluster-agent status" {
+#   run bash -c "kubectl get po -n datadog -o wide | grep 'datadog-agent-cluster-agent'"
+#   [[ "${output}" =~ "Running" ]]
+# }

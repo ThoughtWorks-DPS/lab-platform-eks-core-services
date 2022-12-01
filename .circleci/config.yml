@@ -115,10 +115,10 @@ jobs:
       #     name: deploy aws-efs-csi-driver
       #     command: bash scripts/deploy_efs_csi_driver.sh << parameters.cluster >>
 
-      - run:
-          name: deploy datadog agents
-          command: bash scripts/deploy_datadog_agent.sh << parameters.cluster >>
-      - do/circle-deploy
+      # - run:
+      #     name: deploy datadog agents
+      #     command: bash scripts/deploy_datadog_agent.sh << parameters.cluster >>
+      # - do/circle-deploy
       - do/slack-webhook:
           message: lab-platform-eks-core-services << parameters.cluster >> deployment
           webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
@@ -163,60 +163,60 @@ jobs:
       #     name: conformance tests
       #     command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> quick
 
-  update-monitors:
-    parameters:
-      cluster:
-        description: cluster monitors to update
-        type: string
-      shell:
-        description: shell option directive
-        type: string
-        default: /bin/bash -eo pipefail
-      source-env:
-        description: .env file to source into BASH_ENV
-        type: string
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-environment:
-          cluster: << parameters.cluster >>
-          source-env: << parameters.source-env >>
-      - run:
-          name: install requirements
-          command: pip install -r requirements.txt
-      - run:
-          name: update datadog cluster monitors
-          command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .default_node_group_desired_size) $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
+  # update-monitors:
+  #   parameters:
+  #     cluster:
+  #       description: cluster monitors to update
+  #       type: string
+  #     shell:
+  #       description: shell option directive
+  #       type: string
+  #       default: /bin/bash -eo pipefail
+  #     source-env:
+  #       description: .env file to source into BASH_ENV
+  #       type: string
+  #   docker:
+  #     - image: << pipeline.parameters.executor-image >>
+  #   shell: << parameters.shell >>
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - set-environment:
+  #         cluster: << parameters.cluster >>
+  #         source-env: << parameters.source-env >>
+  #     - run:
+  #         name: install requirements
+  #         command: pip install -r requirements.txt
+  #     - run:
+  #         name: update datadog cluster monitors
+  #         command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .default_node_group_desired_size) $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
 
 
   # update multi-cluster dashboard
-  update-dashboard:
-    parameters:
-      shell:
-        description: shell option directive
-        type: string
-        default: /bin/bash -eo pipefail
-      source-env:
-        description: .env file to source into BASH_ENV
-        type: string
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-environment:
-          cluster: sandbox-us-east-2
-          source-env: << parameters.source-env >>
-      - run:
-          name: install requirements
-          command: pip install -r requirements.txt
-      - run:
-          name: update lab-platform-eks-core-services dashboard
-          command: bash scripts/deploy_dashboard.sh sandbox-us-east-2
+  # update-dashboard:
+  #   parameters:
+  #     shell:
+  #       description: shell option directive
+  #       type: string
+  #       default: /bin/bash -eo pipefail
+  #     source-env:
+  #       description: .env file to source into BASH_ENV
+  #       type: string
+  #   docker:
+  #     - image: << pipeline.parameters.executor-image >>
+  #   shell: << parameters.shell >>
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - set-environment:
+  #         cluster: sandbox-us-east-2
+  #         source-env: << parameters.source-env >>
+  #     - run:
+  #         name: install requirements
+  #         command: pip install -r requirements.txt
+  #     - run:
+  #         name: update lab-platform-eks-core-services dashboard
+  #         command: bash scripts/deploy_dashboard.sh sandbox-us-east-2
 
 workflows:
   version: 2
@@ -297,40 +297,40 @@ workflows:
   #         shell: << pipeline.parameters.shell-options >>
   #         filters: *on-tag-main
 
-  deploy core service monitors:
-    jobs:
-      - update-monitors:
-          name: update sandbox-us-east-2 monitors
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          cluster: sandbox-us-east-2
-          filters: *on-push-main
+  # deploy core service monitors:
+  #   jobs:
+  #     - update-monitors:
+  #         name: update sandbox-us-east-2 monitors
+  #         context: << pipeline.parameters.context >>
+  #         shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+  #         source-env: op.nonprod.env
+  #         cluster: sandbox-us-east-2
+  #         filters: *on-push-main
 
-      - approve prod-us-east-1 monitors release:
-          type: approval
-          requires:
-            - update sandbox-us-east-2 monitors
-          filters: *on-push-main
+  #     - approve prod-us-east-1 monitors release:
+  #         type: approval
+  #         requires:
+  #           - update sandbox-us-east-2 monitors
+  #         filters: *on-push-main
 
-      - update-monitors:
-          name: update prod-us-east-1 monitors
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          source-env: op.prod.env
-          cluster: prod-us-east-1
-          requires:
-            - approve prod-us-east-1 monitors release
-          filters: *on-push-main
+  #     - update-monitors:
+  #         name: update prod-us-east-1 monitors
+  #         context: << pipeline.parameters.context >>
+  #         shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
+  #         source-env: op.prod.env
+  #         cluster: prod-us-east-1
+  #         requires:
+  #           - approve prod-us-east-1 monitors release
+  #         filters: *on-push-main
 
-  deploy core-services dashboard:
-    jobs:
-      - update-dashboard:
-          name: update eks-core-service dashboards
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          filters: *on-push-main
+  # deploy core-services dashboard:
+  #   jobs:
+  #     - update-dashboard:
+  #         name: update eks-core-service dashboards
+  #         context: << pipeline.parameters.context >>
+  #         shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+  #         source-env: op.nonprod.env
+  #         filters: *on-push-main
 
   nightly-validation:
     triggers:
@@ -353,8 +353,8 @@ workflows:
           shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
           source-env: op.prod.env
           cluster: prod-us-east-1
-      - update-dashboard:
-          name: refresh eks-core-service dashboard
-          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          context: << pipeline.parameters.context >>
+      # - update-dashboard:
+      #     name: refresh eks-core-service dashboard
+      #     shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+      #     source-env: op.nonprod.env
+      #     context: << pipeline.parameters.context >>
