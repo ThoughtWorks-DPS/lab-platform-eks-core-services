@@ -11,4 +11,6 @@ module "cluster_autoscaler_irsa" {
       namespace_service_accounts = ["kube-system:cluster-autoscaler"]
     }
   }
+
+  cluster_autoscaler_cluster_names = [ var.cluster_name ]
 }
