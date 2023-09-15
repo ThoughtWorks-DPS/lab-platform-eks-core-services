@@ -21,7 +21,7 @@ parameters:
   executor-image:
     description: image to use for local jobs
     type: string
-    default: twdps/circleci-kube-ops:alpine-0.7.0
+    default: twdps/circleci-kube-ops:alpine-1.8.0
 
 # ==== triggers
 
@@ -122,6 +122,10 @@ jobs:
       - do/slack-webhook:
           message: lab-platform-eks-core-services << parameters.cluster >> deployment
           webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
+
+      - run:
+          name: deploy pixie labs
+          command: bash scripts/deploy_pixie.sh << parameters.cluster >>
 
       # the provision of the efes location is commented out pending correction of above
       - run:
