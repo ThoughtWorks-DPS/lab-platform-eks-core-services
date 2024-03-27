@@ -131,6 +131,10 @@ jobs:
           name: deploy flagger
           command: bash scripts/deploy_flagger.sh
 
+      - run:
+          name: deploy k6
+          command: bash scripts/deploy_k6.sh
+
       # the provision of the efes location is commented out pending correction of above
       - run:
           name: deploy core-services-resources
