@@ -127,6 +127,10 @@ jobs:
           name: deploy pixie labs
           command: bash scripts/deploy_pixie.sh << parameters.cluster >>
 
+      - run:
+          name: deploy flagger
+          command: bash scripts/deploy_flagger.sh
+
       # the provision of the efes location is commented out pending correction of above
       - run:
           name: deploy core-services-resources
