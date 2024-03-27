@@ -1,1 +1,0 @@
-The deploy_datadog_agent.sh script generates the helm values.yaml into this folder

@@ -12,8 +12,4 @@ variable "metrics_server_version" {}
 variable "kube_state_metrics_chart_version" {}
 variable "alert_channel" {}
 
-variable "datadog_api_key" {}
-variable "datadog_app_key" {}
-variable "datadog_cluster_agent_version" {}
-variable "datadog_agent_version" {}
 variable "pixie_deploy_key" {}

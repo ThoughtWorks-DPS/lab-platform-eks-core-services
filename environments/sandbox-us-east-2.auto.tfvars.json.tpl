@@ -11,9 +11,5 @@
     "aws_efs_csi_driver_chart_version": "2.2.7",
     "alert_channel": "sandbox",
 
-    "datadog_api_key": "{{ op://empc-lab/svc-datadog/api-key }}",
-    "datadog_app_key": "{{ op://empc-lab/svc-datadog/app-key }}",
-    "datadog_cluster_agent_version": "1.22.0",
-    "datadog_agent_version": "7.39.0",
     "pixie_deploy_key": "{{ op://empc-lab/svc-pixie/deploy-key }}"
 }
